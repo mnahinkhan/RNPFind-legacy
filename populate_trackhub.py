@@ -8,8 +8,8 @@ competitive_threshold_bp = _str.split("\n")[0].split()[-1]
 cooperative_threshold_bp = _str.split("\n")[1].split()[-1]
 
 hub, genomes_file, genome, trackdb = trackhub.default_hub(
-    hub_name="RBPs on Neat1 and Malat1",
-    short_label = "RBPs on Neat1 and Malat1 w.r.t. AUF1",
+    hub_name="RBPs on Neat1 and Malat1: no-overlap",
+    short_label = "RBPs on Neat1 and Malat1 w.r.t. AUF1: no-overlap",
     long_label = ("RNA binding proteins on long non-coding RNAs " +
         "Neat1 and Malat1 with respect to the biniding sites of " + 
         "AUF1. The red sites are the places where proteins have " +

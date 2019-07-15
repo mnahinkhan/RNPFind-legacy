@@ -1,5 +1,10 @@
 from sortedcontainers import SortedSet #Allow sorted brackets of binding sites
 
+
+overlap_conflict = "no-overlap"
+#overlap_conflict = "intersect"
+#overlap_conflict = "union"
+
 class BindingSites():
 	#Note that, in order to store binding sites in an ordered and non-redundant fashion from
 	#multiple sources, a BindingSites class was implemented here.
@@ -68,9 +73,14 @@ class BindingSites():
 	def collapse(l,f=-1):
 		'''Takes a list of overlapping ranges and collapses them into one'''
 		#print(l,'l from collapses')
-		to_return = ( min(l,key=lambda x:x[0])[0] , 
-					max(l,key=lambda x:x[1])[1], 
-					BindingSites.merge_meta(list(map(lambda x:x[2],l)),f))
+		if overlap_conflict=="union":
+			to_return = ( min(l,key=lambda x:x[0])[0] , 
+						max(l,key=lambda x:x[1])[1], 
+						BindingSites.merge_meta(list(map(lambda x:x[2],l)),f))
+		elif overlap_conflict=="intersect":
+			to_return = ( max(l,key=lambda x:x[0])[0] , 
+						min(l,key=lambda x:x[1])[1], 
+						BindingSites.merge_meta(list(map(lambda x:x[2],l)),f))
 		return to_return
 
 	
@@ -90,11 +100,19 @@ class BindingSites():
 			raise ValueError("Please keep three values in the tuple: " +
 				"(start, end, annotation)")
 
+
+		if overlap_conflict=="no-overlap":
+			self.sorted_sites.add(new_site)
+			return
+
 		start,end,metadata = new_site
+
 
 		#binary search to find where the new range lies
 		start_pos = self.sorted_sites.bisect_left((start,0))
 		end_pos = self.sorted_sites.bisect_left((end,0))
+
+
 
 		#initiate list of ranges that might be merged
 		to_merge = [new_site]
