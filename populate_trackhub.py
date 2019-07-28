@@ -7,9 +7,12 @@ _str = f.read()
 competitive_threshold_bp = _str.split("\n")[0].split()[-1]
 cooperative_threshold_bp = _str.split("\n")[1].split()[-1]
 
+from bind_analysis import overlap_conflict
+
+print(overlap_conflict)
 hub, genomes_file, genome, trackdb = trackhub.default_hub(
-    hub_name="RBPs on Neat1 and Malat1: no-overlap",
-    short_label = "RBPs on Neat1 and Malat1 w.r.t. AUF1: no-overlap",
+    hub_name=("RBPs on Neat1 and Malat1: " + overlap_conflict),
+    short_label = ("RBPs on Neat1 and Malat1 w.r.t. AUF1: " + overlap_conflict),
     long_label = ("RNA binding proteins on long non-coding RNAs " +
         "Neat1 and Malat1 with respect to the biniding sites of " + 
         "AUF1. The red sites are the places where proteins have " +
@@ -39,8 +42,8 @@ for filename in glob.iglob("../rbp_binding_sites_bed_files/**/*.bb", recursive=T
     'HNRNPF','YBX1','HNRNPU']
     visibility = "dense" if rbp in visibleRBPs else "hide"
 
-    print(category)
-    print(("comp" if category=="computational" else "exp"))
+    #print(category)
+    #print(("comp" if category=="computational" else "exp"))
     track = trackhub.Track(
         name=rbp+"_"+category,
         short_label=rbp+"_"+ ("comp" if category=="computational" else "exp"),

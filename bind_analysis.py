@@ -1,6 +1,19 @@
-from binding_analysis_binding_sites import BindingSites
+from binding_analysis_binding_sites import BindingSites,overlap_conflict
 import xlrd #just cuz of populate function?
 import pandas as pd #just for populate...?
+from operator import itemgetter
+import difflib #Just to suggest keys when misspelt!
+
+
+firstItem = itemgetter(0)
+secondItem = itemgetter(1)
+
+#TO-do:
+#Consider the need for synonym_function as an initialization parameter, and think about
+#membership of genes when genes are represented as comma separated values sometimes.
+#Consider the __contains__() function.
+#Priority: low 
+#Justification: most people will iterate through the storage instead of testing with 'in'.
 
 class Storage():
 	#This class stores data about a lncRNA and RBPs that might bind to it, as well as
@@ -75,6 +88,8 @@ class Storage():
 	def items(self):
 		return self._RBPs.items()
 
+	def values(self):
+		return self._RBPs.values()
 	def __getitem__(self, item):
 		if type(item) is str: 
 			item = item.upper()
@@ -297,9 +312,11 @@ class Storage():
 		"""
 
 		if sortby=='Gene':
-			sortby=0
+			sorter = firstItem
+			isReverse = False
 		else:
-			sortby=1
+			sorter = secondItem
+			isReverse = True
 
 		Z = []
 		for k in self._RBPs:
@@ -307,7 +324,7 @@ class Storage():
 
 
 		
-		for e in sorted(Z,key=lambda x:x[sortby],reverse=[False,True][sortby]):
+		for e in sorted(Z,key=sorter,reverse=isReverse):
 			print(e)
 
 		print('There is a total number of',sum([k for (a,k) in Z]),
@@ -357,7 +374,7 @@ class Storage():
 					tuple_list.append((i,j,Z_f[i][j]))
 
 
-			sorted_tuple_list = sorted(tuple_list,key = lambda t: t[2],reverse=True)
+			sorted_tuple_list = sorted(tuple_list,key = secondItem,reverse=True)
 
 			self.corr_table = Z
 			self.corr_table_f_measure = Z_f
