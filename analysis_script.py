@@ -122,7 +122,7 @@ from operator import itemgetter
 firstItem = itemgetter(0)
 secondItem = itemgetter(1)
 firstTwoItems = itemgetter(0,1)
-
+thirdItem = itemgetter(2)
 ############.....DATA COLLECTION AND PROCESSING....###########
 
 
@@ -142,7 +142,7 @@ analysis_threshold_bps = [10,15,30,50]
 
 
 #The newer form of analysis: per binding site
-analysis_per_binding_site = False
+analysis_per_binding_site = True
 #Window of bp range to look outside each AUF1 site
 analysis_per_binding_site_window = 56
 #Threshold for how much is considered to be competitive
@@ -170,8 +170,6 @@ customdataAdd = True
 
 
 experimental_binding_site_acceptable_coverage_ratio = 1/3
-
-analyse_depth_of_overlapping_fragements = True
 
 #Before starting:
 #Let's take care of the gene synonyms problem as follows.
@@ -350,7 +348,8 @@ for dataload_source, storageSpace in zip(
 			#Experimental data tends to contain extra binding sites that make them cover too much.
 			#Let's filter them:
 			for storage in [neat1_storage,malat1_storage]:
-				max_coverage = max([bindingsite.baseCover() for rbp, bindingsite in storage.items()])	
+				max_coverage = max([bindingsite.baseCover() for rbp, bindingsite in storage.items()])
+				print(max_coverage,'max_coverage!')	
 				allowed_coverage = experimental_binding_site_acceptable_coverage_ratio * max_coverage
 				for binding_site in storage.values():
 					binding_site.overlap_collapse("baseCoverNumber",allowed_coverage,inPlace = True)			
@@ -600,7 +599,7 @@ for dataload_source, storageSpace in zip(
 
 					#Separate binding sites and annotation:
 					closest_sites = list(map(firstTwoItems,binding_sites))
-					annotations = list(map(secondItem,binding_sites))
+					annotations = list(map(thirdItem,binding_sites))
 
 					#Check if the RBP has experimental evidence for binding AUF1:
 					isBindAUF1 = AUF1Filter(rbp)
@@ -767,19 +766,6 @@ for dataload_source, storageSpace in zip(
 				norm_scores)
 			print(";".join(map(str,item)))
 
-	if analyse_depth_of_overlapping_fragements:
-		
-		None
-
-		# def mapper(rbpsites):
-		# 	rbp = rbpsites[0]
-		# 	sites = rbpsites[1]
-		# 	depth = return_depth(sites)
-		# 	deepest = max(depth)
-		# 	return(rbp,depth,deepest)
-
-		# d = list(map(mapper,neat1_storage.items()))
-		# print([d[j][2] for j in range(len(d))])
 
 
 
