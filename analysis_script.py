@@ -174,11 +174,16 @@ experimental_binding_site_acceptable_coverage_ratio = 1/3
 #Before starting:
 #Let's take care of the gene synonyms problem as follows.
 
-computational_storage = {}
-experimental_storage = {}
+
+dataload_sources = ['computational','experimental']
+bigStorage = {}
+for dataload_source in dataload_sources:
+	bigStorage[dataload_source] = {}
+
+
 for dataload_source, storageSpace in zip(
 	['computational','experimental'],
-	[computational_storage,experimental_storage]):
+	bigStorage.values()):
 	print('dsd')
 	if dictionaryBuild and not('synonym_dict' in vars() and not refreshSynonymDict):
 		
@@ -615,7 +620,7 @@ for dataload_source, storageSpace in zip(
 
 				#Now sort and print!
 				for toPrint in sorted(listOfThingsToPrint, 
-					key = lambda k: (min(k[2]),1-lncRNA_storage.lookup("AUF1",k[0]))):
+					key = lambda k: min(k[2])):
 
 					#Unpack
 					rbp, closest_sites, distances, annotations, isBindAUF1 = toPrint
