@@ -181,9 +181,47 @@ for dataload_source in dataload_sources:
 	bigStorage[dataload_source] = {}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 for dataload_source, storageSpace in zip(
 	['computational','experimental'],
 	bigStorage.values()):
+
+
+
+
+
+
+
+
+
 	print('dsd')
 	if dictionaryBuild and not('synonym_dict' in vars() and not refreshSynonymDict):
 		
@@ -220,6 +258,28 @@ for dataload_source, storageSpace in zip(
 	else:
 		print("Synonyn dictionary already exists, skipping building..."
 			+  "set refreshSynonymDict to True to change this!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -260,6 +320,28 @@ for dataload_source, storageSpace in zip(
 		else:
 			neat1_storage = Storage(annotation_merge_func = merge_func)
 			malat1_storage = Storage(annotation_merge_func = merge_func)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -307,6 +389,18 @@ for dataload_source, storageSpace in zip(
 			#Convenient function:
 			malat1_storage.populate(file_paths,mis_alignments,data_sources)
 			print("complete!")
+
+
+
+
+
+
+
+
+
+
+
+
 
 		elif dataload_source=="experimental":
 			malat1_displacement = 65497736
@@ -362,6 +456,21 @@ for dataload_source, storageSpace in zip(
 		else:
 			raise ValueError("Dataload source not set correctly")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		##########Getting the AUF1 PAR-CLIP Data##############
 		print("Obtaining PARCLIP Data on AUF1...")
 
@@ -383,6 +492,26 @@ for dataload_source, storageSpace in zip(
 						"to",end,"with motif of", motif)
 
 		print("complete!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		#########Getting the BIOGRID Data####################
 		print("Obtaining BIOGRID Data on AUF1...")
@@ -420,6 +549,14 @@ for dataload_source, storageSpace in zip(
 			return any(x in gene.split(",") for x in AUF1_proteins)
 
 		print("complete!")
+
+
+
+
+
+
+
+
 
 		#This section is for adding HPRD genes to the list of BIOGRID proteins that
 		#interact with AUF1 with protein-protein interaction
@@ -460,8 +597,38 @@ for dataload_source, storageSpace in zip(
 	else:
 		print("lncRNA storages already exists, skipping building..."
 			+  "set refreshNeat1Malat1Storages to True to change this!")
-	#################
-	#All the data has been added. So we just have to analyse the data now:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	if filterTopSites:
@@ -480,20 +647,84 @@ for dataload_source, storageSpace in zip(
 			sorted(malat1sites,key=lambda k:int(k[2].split()[1]),
 			reverse=True)[:math.ceil(len(malat1sites)*filterPercentage_Malat1)])
 
-	# print(neat1_storage["AUF1"])
-	# print(malat1_storage["AUF1"])
-	# print(neat1_storage["AUF1"].len())
-	# print(while True:
-	# 	5+5malat1_storage["AUF1"].len())
-	# 
-	#Analysis takes time. Set to true to analyse:
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	if customdataAdd:
 		for rbp,binding_sites in neat1_custom_data.items():
 			neat1_storage[rbp] = BindingSites(binding_sites)
 		for rbp,binding_sites in malat1_custom_data.items():
 			malat1_storage[rbp] = BindingSites(binding_sites)
-			                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	#################
+	#All the data has been added. So we just have to analyse the data now:
+
+
+	                     
 	if analysis_overall_correlation:
 		for analysis_threshold_bp in analysis_threshold_bps:
 			print("\n")
@@ -541,6 +772,41 @@ for dataload_source, storageSpace in zip(
 
 
 			print("complete!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	if analysis_per_binding_site:
 
