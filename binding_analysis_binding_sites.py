@@ -473,7 +473,8 @@ class BindingSites():
 				depth_cutoff+=1
 
 			if depth_cutoff==-1:
-				print("WARNING: your baseCoverNumber is impossible to achieve!")
+				#print("WARNING: your baseCoverNumber is impossible to achieve!")
+				None
 
 		elif mode == 'TopDepthRatio':
 			if not (0<=number<=1):
