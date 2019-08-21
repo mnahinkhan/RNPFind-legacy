@@ -9,6 +9,9 @@ thirdItem = itemgetter(2)
 overlap_conflict = 'union'
 #To-do, remove the above and fix dependencies
 
+
+#To-do: implement a featuere that allows belonging relationship to mean overlap over the structure...
+#Todo: implement a map function
 class BindingSites():
 	#Note that, in order to store binding sites in an ordered and non-redundant fashion from
 	#multiple sources, a BindingSites class was implemented here.
@@ -329,6 +332,7 @@ class BindingSites():
 	def printBED(self, name = "Generic Binding Site", chrN = 1, displacement = 0,
 		endInclusion = False, addAnnotation = False, includeScore = False, scoreMax = 1000,
 		scoreBase = 1000, includeColor = False, conditionalColor_func = -1, isBar = False):
+		#TOdo: Possibly remove the functionality for isBar, it seems misplaced!
 		outputStr = ""
 		if type(chrN) is not str:
 			chrN = "chr" + str(chrN)

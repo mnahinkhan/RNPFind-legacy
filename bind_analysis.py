@@ -495,3 +495,12 @@ class Storage():
 		else:
 			header = ""
 		return header+outputStr
+
+
+	def sumOverAll(self):
+		newBindingSite = BindingSites(overlap_mode=True)
+		for rbp in self:
+			for site in self[rbp]:
+				#print(site)
+				newBindingSite.add(site)
+		return newBindingSite

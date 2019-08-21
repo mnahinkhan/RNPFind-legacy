@@ -41,7 +41,7 @@
 #	07/01 09:14		  07/01 11:35
 #	07/03 21:10		  07/03 23:35 #Options for loading from expeirmental clip sources
 #	07/07 12:24 	  07/07 12:57 #Breaking the file apart into multiple parts
-
+#	08/18 06:00		  08/18 12:35
 
 
 
@@ -142,7 +142,7 @@ analysis_threshold_bps = [10,15,30,50]
 
 
 #The newer form of analysis: per binding site
-analysis_per_binding_site = True
+analysis_per_binding_site = False
 #Window of bp range to look outside each AUF1 site
 analysis_per_binding_site_window = 56
 #Threshold for how much is considered to be competitive
@@ -175,7 +175,22 @@ experimental_binding_site_acceptable_coverage_ratio = 1/3
 #Let's take care of the gene synonyms problem as follows.
 
 
+
+#For now, we support two types of data: experimental and computational
 dataload_sources = ['computational','experimental']
+
+
+#Generilzation to as many as you like!
+#ToDo: Support a list of genes in a text file.
+listofRNAs = ["Neat1","Malat1"]
+
+
+
+
+
+
+
+#Link all of them to empty dictionaries
 bigStorage = {}
 for dataload_source in dataload_sources:
 	bigStorage[dataload_source] = {}
@@ -211,7 +226,7 @@ for dataload_source in dataload_sources:
 
 
 for dataload_source, storageSpace in zip(
-	['computational','experimental'],
+	dataload_sources,
 	bigStorage.values()):
 
 
@@ -222,7 +237,6 @@ for dataload_source, storageSpace in zip(
 
 
 
-	print('dsd')
 	if dictionaryBuild and not('synonym_dict' in vars() and not refreshSynonymDict):
 		
 		print("Building the synonym dictionary...")
@@ -687,6 +701,12 @@ for dataload_source, storageSpace in zip(
 			malat1_storage[rbp] = BindingSites(binding_sites)
 
 
+
+
+	sumDataAdd = True
+	if sumDataAdd:
+		None
+		#neat1_storage["SUM"] = 
 
 
 
