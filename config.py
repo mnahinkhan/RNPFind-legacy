@@ -1,56 +1,59 @@
-#Building dictionary takes time. Set to false to use an identity function instead.
+# Building dictionary takes time. Set to false to use an identity function instead.
 
 dictionaryBuild = True
 ncbi_gene_path = "../Raw Data/NCBI Gene Info/"
 ncbi_gene_files = ["Human Genes and Synonyms.xlsx",
-				"Saccharomyces_cerevisiae.xlsx",
-				"Drosophila_melanogaster.xlsx"]
+                   "Saccharomyces_cerevisiae.xlsx",
+                   "Drosophila_melanogaster.xlsx"]
 refreshSynonymDict = False
 
+# Loading the data for RBP binding sites on lncRNA, as well as BIOGRID protein-protein
+# interactions.
+# dataLoad = True
 
-#Loading the data for RBP binding sites on lncRNA, as well as BIOGRID protein-protein
-#interactions. 
-dataLoad = True
 
-
-#Analysis takes time. Set to true to analyse:
+# Analysis takes time. Set to true to analyse:
 analysis_overall_correlation = False
-#What are the basepair stringencies you want to analyse?
-analysis_threshold_bps = [10,15,30,50]
+# What is the base pair stringency you want to analyse with?
+analysis_threshold_bps = [10, 15, 30, 50]
 
-
-#The newer form of analysis: per binding site
+# The newer form of analysis: per binding site
 analysis_per_binding_site = False
-#Window of bp range to look outside each AUF1 site
+# Window of bp range to look outside each AUF1 site
 analysis_per_binding_site_window = 56
-#Threshold for how much is considered to be competitive
+# Threshold for how much is considered to be competitive
 analysis_per_binding_site_competititive_range = 15
 
-
-#Some of the variables that take long to load will not be loaded again if this
-#parameter is set to False. Namely, neat1_storage, malat1_storage, and synonym_dict.
+# Some of the variables that take long to load will not be loaded again if this
+# parameter is set to False. Namely, neat1_storage, malat1_storage, and synonym_dict.
 
 refreshStorages = True
 
-#Filter top sites on Neat1 and Malat1
+# Add modified custom data?
+custom_data_add = True
+
+experimental_binding_site_acceptable_coverage_ratio = 1/3  # TODO: Decide on what this ought to be
+
+# For now, we support two types of data: experimental and computational
+dataload_sources_supported = ['RBPDB (computational)', 'ATTRACT (computational)', 'RBPMap (computational',
+                              'POSTAR (experimental)', 'User custom data']
+dataload_sources_supported_internal = ["computational", "computational", "computational", "experimental", "custom"]
+# TODO: Allow user-interactive selection of data_source selection
+
+
+analysis_methods_supported = ["Binding correlation analysis", "Per-binding-site analysis",
+                              "Visualize on UCSC Genome Browser", "Competition-Cooperation Visualization",
+                              "SumOverAll Analysis"]
+
+analysis_methods_supported_internal = ['binding', 'per_binding', 'ucsc', 'comp_coop', 'sumOA']
+
+# Filter top sites on Neat1 and Malat1
 
 filterTopSites = True
-#Top how many percent of binding sites should I keep?
-filterPercentage_Neat1 = 0.30
-filterPercentage_Malat1 = 0.25
+filterRBPs = ['AUF1']
+filteredContainers = ['experimental']
+# Top how many percent of binding sites should I keep?
+topSitesFilterPercentage = 0.30
 
-#Add modified custom data?
-customdataAdd = True
-
-experimental_binding_site_acceptable_coverage_ratio = 1/3
-
-#For now, we support two types of data: experimental and computational
-dataload_sources = ['computational','experimental']
-
-
-#Generilzation to as many as you like!
-#ToDo: Support a list of genes in a text file.
-listofRNAs = ["Neat1","Malat1"]
-
-malat1_displacement = 65497736
-neat1_displacement = 65422796
+# Genome version being used
+genome_version = 'hg38'

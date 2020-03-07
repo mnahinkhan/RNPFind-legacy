@@ -25,6 +25,8 @@ def generate_merge_func(dataload_source):
 		return merge_func
 
 	elif dataload_source=='experimental':
-		return -1
+		return lambda x:x
+	elif dataload_source=='custom':
+		return lambda x:x
 	else:
 		raise ValueError("Diagnose this misideintificaiton plz")

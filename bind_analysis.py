@@ -303,7 +303,7 @@ class Storage():
 
 
 	
-	def summary(self,sortby='NumberOfSites'):
+	def summary(self,sortby='NumberOfSites',isReturn=False):
 		"""If you ever want to inspect the a storage variable, use summary().
 
 		Show binding site information in sorted order:
@@ -323,10 +323,12 @@ class Storage():
 			Z.append((k,len(self._RBPs[k])))
 
 
-		
-		for e in sorted(Z,key=sorter,reverse=isReverse):
-			print(e)
+		if not isReturn:
+			for e in sorted(Z,key=sorter,reverse=isReverse):
+				print(e)
 
+		if isReturn:
+			return (len(self._RBPs), sum([k for (a,k) in Z]))
 		print('There is a total number of',sum([k for (a,k) in Z]),
 				'binding sites from', len(self._RBPs), 'genes as shown above.')
 
