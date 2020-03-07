@@ -28,4 +28,4 @@ For data analysis, we plan on adding multiple forms of analysis, including:
  For a detailed explanation of each of the above analysis methods, consult the manual (to be updated).
  
  
- Note that the repository hosts only the script files and misses key data files necessary for the tool's function. These files will be added later once the tool is ready for deployment
+ Note that the repository hosts only the script files and misses key data files necessary for the tool's function. These files will be added later once the tool is ready for deployment.
