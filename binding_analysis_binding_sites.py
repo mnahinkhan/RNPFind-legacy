@@ -192,7 +192,7 @@ class BindingSites():
         This is because this function checks the "distances" of each of the
         binding sites of one set of BindingSites with all of the other set
         to count the minimal distance and give a scoring based on that.
-        Since one of the set of BindingSites could be ubiquotous, the scores
+        Since one of the set of BindingSites could be ubiquitous, the scores
         may vary greatly.
 
         """

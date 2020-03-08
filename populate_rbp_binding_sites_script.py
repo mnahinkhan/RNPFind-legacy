@@ -3,8 +3,8 @@ import os
 from config import genome_version
 
 
-def populate_binding_sites(bigStorage, RNAInfo, dataload_sources, main_rbp):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = RNAInfo
+def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
+    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
 
     displacement = RNA_start_chr_coord
     year, month, day, hour, min, sec, x, y, z = datetime.now().timetuple()
@@ -13,14 +13,14 @@ def populate_binding_sites(bigStorage, RNAInfo, dataload_sources, main_rbp):
 
     overarching_path = "../rbp_binding_sites_bed_files/" + time_date + "/"
 
-    for dataload_source in dataload_sources:
-        print("starting!", dataload_source)
+    for data_load_source in data_load_sources:
+        print("starting!", data_load_source)
 
-        storage = bigStorage[dataload_source]
+        storage = big_storage[data_load_source]
 
         folder_path = overarching_path + (
             "experimental/"
-            if dataload_source == "experimental"
+            if data_load_source == "experimental"
             else "computational/")
 
         if not os.path.exists(folder_path):
@@ -52,7 +52,7 @@ def populate_binding_sites(bigStorage, RNAInfo, dataload_sources, main_rbp):
             # print(rbp)
 
             # if rbp[:4] == "AUF1":
-            #     if dataload_source == "computational":
+            #     if data_load_source == "computational":
             #         continue
 
             # maxScoreReads = [max(map(lambda k: int(k[2].split()[1]), storage[rbp]))
@@ -63,7 +63,7 @@ def populate_binding_sites(bigStorage, RNAInfo, dataload_sources, main_rbp):
             #     includeHeader=True, includeScore=True, scoreBase=maxScore, includeColor=True))
             #     for storage, displacement, maxScore in zip(lncRNAstorages, lncRNA_displacements, maxScoreReads)]
 
-            # elif dataload_source == "computational" and "CUSTOM" in rbp:
+            # elif data_load_source == "computational" and "CUSTOM" in rbp:
             #     continue
 
             # else:
@@ -77,7 +77,7 @@ def populate_binding_sites(bigStorage, RNAInfo, dataload_sources, main_rbp):
             # total_sites = ''.join(lncRNA_sites)
             # print(total_sites)
 
-            filepath = rbp + ("_experimental" if dataload_source == "experimental" else "_computational") \
+            filepath = rbp + ("_experimental" if data_load_source == "experimental" else "_computational") \
                                                                     + "_" + genome_version + "_sites.bed"
 
             filepath = folder_path + "/" + filepath

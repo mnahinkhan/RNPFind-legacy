@@ -41,7 +41,7 @@ from getAUF1ParClip import getAUF1ParClip
 from getAUF1BioGrid import getAUF1BioGrid
 from loadData import load_data
 from merge_annotation_funcs import generate_merge_func
-from overAllCorrAnalysis import overAllCorrAnalysis
+from overAllCorrAnalysis import overall_correlation_analysis
 from perBindingSiteAnalysis import perBindingSiteAnalysis
 from userInput import user_input
 from userInput import user_data_source_preference
@@ -49,30 +49,30 @@ from userInput import user_analysis_preference
 from ucsc_visualize import ucsc_visualize
 from selector import select
 
-# Get some itemgetters ready for the rest of the journey:
+# Get some item getters ready for the rest of the journey:
 firstItem = itemgetter(0)
 
 # Explanation of data structure used in this program:
 
-# Top level: bigStorage (dict)
-# Branches (keys): dataload_sources:
+# Top level: big_storage (dict)
+# Branches (keys): data_load_sources:
 # 'computational', 'experimental', 'custom', etc.
 
 # Next level:
-# bigStorage[source]
+# big_storage[source]
 # Value: Storage variable (RBP -> RNA intervals mapping)
 # Branches (keys): RBPs
-# 'AUF1', 'HNRNPC', etc.
+# 'HNRNPD', 'HNRNPC', etc.
 
 # Next level:
-# bigStorage[source][RBP]
+# big_storage[source][RBP]
 # Value: a BindingSites variable,
 # a bunch of RBP binding sites (intervals)
 
 # E.g. To get the binding sites of HNRNPC on
 # the template RNA as determined experimentally:
 
-# bigStorage['experimental']['HNRNPC']
+# big_storage['experimental']['HNRNPC']
 
 
 synonym_func = dealWithDictionaryBuilding()
@@ -81,22 +81,22 @@ synonym_func = dealWithDictionaryBuilding()
 
 RNAInfo = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]
 
-dataload_sources = user_data_source_preference()
+data_load_sources = user_data_source_preference()
 print("Collecting data now...")
 
 # Link all of them to empty dictionaries
 bigStorage = {}
-for dataload_source in dataload_sources:
-    bigStorage[dataload_source] = {}
+for data_load_source in data_load_sources:
+    bigStorage[data_load_source] = {}
 # Done
 
 
 # Now we start down each hierarchy:
-for dataload_source in dataload_sources:
+for data_load_source in data_load_sources:
     # Affects storageSpace by side-effect
     #######Loads computational and experimental data for#####
     #######RBPs that bind the lncRNAs of interest##########
-    load_data(dataload_source, synonym_func, bigStorage, RNAInfo)
+    load_data(data_load_source, synonym_func, bigStorage, RNAInfo)
 
 # LOADING DATA
 
@@ -136,7 +136,7 @@ print("complete!")
 
 no_genes = 0
 no_sites = 0
-for no_gene, no_site in [bigStorage[k].summary(isReturn=True) for k in bigStorage]:
+for no_gene, no_site in [bigStorage[k].summary(is_return=True) for k in bigStorage]:
     no_genes += no_gene
     no_sites += no_site
 
@@ -145,15 +145,14 @@ print("We have populated " + str(no_genes) + " different RBPs with " + str(no_si
       + str(RNA_end_chr_coord - RNA_start_chr_coord) + " bases specified!")
 print("We are ready now")
 
+# TODO DEAL WITH DATA SOURCES
+
 while True:
     analysis_method = user_analysis_preference()
 
     if analysis_method == "binding":
-        # TODO DEAL WITH DATA SOURCES
-        # storageSpace = select(bigStorage, ['computational'])
-        analysis_sources = ['computational']
-        filter = {"AUF1": AUF1Filter}
-        overAllCorrAnalysis(RNA, mainRBPs, analysis_threshold_bps, filter, bigStorage, analysis_sources)
+
+        overall_correlation_analysis(bigStorage, RNAInfo, data_load_sources)
 
     elif analysis_method == "per_binding":
         # TO DO DEAL WITH DATA SOURCES
@@ -164,7 +163,7 @@ while True:
                                analysis_per_binding_site_competititive_range, analysis_sources)
 
     elif analysis_method == "ucsc":
-        ucsc_visualize(bigStorage, RNAInfo, dataload_sources)
+        ucsc_visualize(bigStorage, RNAInfo, data_load_sources)
 
     elif analysis_method == "comp_coop":
         print("unsupported for now")
