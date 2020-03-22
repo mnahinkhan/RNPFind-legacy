@@ -1,5 +1,6 @@
 from populate_rbp_binding_sites_script import populate_binding_sites
-from populate_trackhub import populate_local_track_hub, convert_bed_to_bb, upload_online, density_plot, convert_wig_to_bw
+from populate_trackhub import populate_local_track_hub, convert_bed_to_bb, upload_online, density_plot, \
+    convert_wig_to_bw
 from config import genome_version
 
 
@@ -37,7 +38,8 @@ def ucsc_visualize(big_storage, rna_info, data_load_sources):
     local_dir = "../ucsc-genome-track-fake/"
     date_time_folder_name = overarching_path.split("/")[-2]
     local_stage = local_dir + date_time_folder_name + "/"
-    hub_name = populate_local_track_hub(overarching_path, main_rbp, rna_info, local_stage, rbp_no_dict)
+    rbp_peaks = {k: max(big_storage[k].sum_over_all().return_depth()) for k in big_storage}
+    hub_name = populate_local_track_hub(overarching_path, main_rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks)
     print("done!")
 
     print("")
@@ -52,6 +54,7 @@ def ucsc_visualize(big_storage, rna_info, data_load_sources):
               date_time_folder_name + "/" + hub_name.replace(" ", "%20") + ".hub.txt"
 
     ucsc_url = "http://genome.ucsc.edu/cgi-bin/hgTracks?db=" + genome_version + "&hubUrl=" + \
-               hub_url+"&position=chr"+str(RNA_chr_no)+":"+str(RNA_start_chr_coord)+"-"+str(RNA_end_chr_coord)
+               hub_url + "&position=chr" + str(RNA_chr_no) + ":" + str(RNA_start_chr_coord) + "-" + str(
+        RNA_end_chr_coord)
 
     print(ucsc_url)

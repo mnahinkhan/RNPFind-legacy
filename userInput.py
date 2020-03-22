@@ -72,9 +72,11 @@ def user_data_source_preference():
     for i, source in enumerate(data_load_sources_supported):
         print("[" + str(i) + "]: " + source)
     print("")
-    print("You may choose any combination from above as you like (e.g. 124)")
-    print(">")
-    s = input()
+    s = ""
+    while not (s.isdigit() and all([int(c) < len(data_load_sources_supported_internal) for c in s])):
+        print("Please choose any combination from above as you like (e.g. 124)")
+        print(">")
+        s = input()
     print("Thank you")
     return [data_load_sources_supported_internal[int(i)] for i in s]
 

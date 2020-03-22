@@ -4,7 +4,7 @@ import glob
 from config import genome_version
 
 
-def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict):
+def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks):
     [RNA, RNA_chr_no, _, _] = rna_info
 
     f = open(overarching_path + "threshold_config.txt")
@@ -63,7 +63,8 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
     for filename in glob.iglob(overarching_path + "**/*.bw", recursive=True):
         dots, directory1, directory2, data_load_source, name = filename.split("/")
         rbp_no = rbp_no_dict[data_load_source]
-
+        rbp_peak = rbp_peaks[data_load_source]
+        rbp_peak = (rbp_peak//10 + 1)*10
         visibility = "full"
         # TODO: consider options for this for the user (add to Config at least)
 
@@ -75,7 +76,9 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
             tracktype='bigWig',
             color="128,0,0",  # TODO: what color ought bigWig density plots be?
             visibility=visibility,
-            chromosomes="chr" + str(RNA_chr_no)
+            chromosomes="chr" + str(RNA_chr_no),
+            viewLimits="0:"+str(rbp_peak),
+            maxHeightPixels="128:50:8"
         )
 
         trackdb.add_tracks(track)
