@@ -32,20 +32,19 @@ refreshStorages = True
 # Add modified custom data?
 custom_data_add = True
 
-experimental_binding_site_acceptable_coverage_ratio = 1/3  # TODO: Decide on what this ought to be
+experimental_binding_site_acceptable_coverage_ratio = 1  # Professor Ihab has decided
 
 # For now, we support two types of data: experimental and computational
-dataload_sources_supported = ['RBPDB (computational)', 'ATTRACT (computational)', 'RBPMap (computational',
+data_load_sources_supported = ['RBPDB (computational)', 'ATTRACT (computational)', 'RBPMap (computational',
                               'POSTAR (experimental)', 'User custom data']
-dataload_sources_supported_internal = ["computational", "computational", "computational", "experimental", "custom"]
+data_load_sources_supported_internal = ["RBPDB", "ATTRACT", "RBPMap", "experimental", "custom"]
 # TODO: Allow user-interactive selection of data_source selection
 
 
 analysis_methods_supported = ["Binding correlation analysis", "Per-binding-site analysis",
-                              "Visualize on UCSC Genome Browser", "Competition-Cooperation Visualization",
-                              "SumOverAll Analysis"]
+                              "Visualize on UCSC Genome Browser", "Competition-Cooperation Visualization"]
 
-analysis_methods_supported_internal = ['binding', 'per_binding', 'ucsc', 'comp_coop', 'sumOA']
+analysis_methods_supported_internal = ['binding', 'per_binding', 'ucsc', 'comp_coop']
 
 # Filter top sites on Neat1 and Malat1
 

@@ -484,10 +484,20 @@ class Storage:
             header = ""
         return header + outputStr
 
-    def sumOverAll(self):
+    def sum_over_all(self):
+        """Creates and returns a new binding site object with all of the binding sites across all RBPs stored in the
+        current storage. Overlap mode is set to True for the returned binding site object."""
+
         newBindingSite = BindingSites(overlap_mode=True)
         for rbp in self:
             for site in self[rbp]:
                 # print(site)
                 newBindingSite.add(site)
         return newBindingSite
+
+    def print_wig(self, chr_no=1, displacement=0, include_name=False, include_description=False, name="",
+                  description="", include_header=True):
+
+        return self.sum_over_all().print_wig(chr_no=chr_no, displacement=displacement, include_name=include_name,
+                                             include_description=include_description, name=name,
+                                             description=description, include_header=include_header)

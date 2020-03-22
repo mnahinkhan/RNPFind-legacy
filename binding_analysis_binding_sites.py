@@ -369,30 +369,27 @@ class BindingSites():
 
         return outputStr
 
-    def _return_depth(self):
-        # Find the rightmost and leftmost binding site reach
-        right_most = max(map(secondItem, self))
-        left_most = min(map(firstItem, self))
-        length = right_most - left_most + 1
+    def return_depth(self, length=-1):
+        """Returns the density array of length (length+1) for binding sites stored.
+
+        Note that binding sites can bind on the 0th nucleotide, and cannot bind on the length'th nucleotide """
+
+        if length == -1:
+            length = max(map(secondItem, self)) + 1
 
         # Stores 'depth' of support for each nucleotide in the
         # molecule in terms of its chances of being a binding site.
         binding_depth = [0] * length
-
-        # note that all indices must be adjusted by left_most
 
         for site in self:
 
             start = site[0]
             end = site[1]
 
-            start = start - left_most
-            end = end - left_most
-
             for nucleotide in range(start, end + 1):  # inclusive
                 binding_depth[nucleotide] += 1
 
-        return (binding_depth, left_most)
+        return binding_depth
 
     def overlap_collapse(self, mode, number, inPlace=False):
         """Collapses the overlapping ranges to non-overlapping ones, based on preset
@@ -440,7 +437,7 @@ class BindingSites():
         if not self.overlap_mode:
             print("WARNING: overlap_collapse() called although overlap_mode is set to off!")
 
-        depth_array, left_idx = self._return_depth()
+        depth_array = self.return_depth()
 
         max_depth = max(depth_array)
 
@@ -458,7 +455,6 @@ class BindingSites():
                 raise ValueError("Ratio should be between 0 and 1")
 
             depth_cutoff = max_depth * (1 - number)
-
 
         elif mode == 'TopDepthNumber':
             depth_cutoff = max_depth - number
@@ -494,13 +490,13 @@ class BindingSites():
                     endRange = nucleotide - 1
                     inRange = False
                     binding_site_to_add_to.add(
-                        (startRange + left_idx, endRange + left_idx))
+                        (startRange, endRange))
 
         if inRange:
             endRange = nucleotide
             inRange = False
             binding_site_to_add_to.add(
-                (startRange + left_idx, endRange + left_idx))
+                (startRange, endRange))
 
         if not inPlace:
             return binding_site_to_add_to
@@ -513,6 +509,39 @@ class BindingSites():
         [d[j][2] for j in range(len(d))]
         '''
 
-    def baseCover(self):
-        depth_array = self._return_depth()[0]
+    def base_cover(self):
+        depth_array = self.return_depth()
         return len(list(filter(lambda k: k > 0, depth_array)))
+
+    def print_wig(self, chr_no=1, displacement=0, include_name=False, include_description=False, name="",
+                  description="", include_header=True, length=-1):
+        """Prints a wig file depicting density of binding sites by the RBP.
+
+        Optional parameter length allows for plotting 0 beyond the rightmost binding site if needed."""
+
+        output_str = ""
+        if include_header:
+            output_str += "track type=wiggle_0 "
+            if include_name:
+                output_str += 'name="' + name + '" '
+            if include_description:
+                output_str += 'description="' + description + '" '
+            output_str += "visibility=full"
+            output_str += '\n'
+
+        # Note the +1 below. I suspect this is necessary as wig files are 1-based...
+        output_str += "fixedStep chrom=chr" + str(chr_no) + " start=" + str(displacement + 1) + " step=1"
+
+        output_str += "\n"
+
+        depth_array = self.return_depth(length=length)  # length long array, 0-indexed
+        output_str += "\n".join(map(str, depth_array))
+
+        return output_str
+
+
+if __name__ == "__main__":
+    # testing return_depth here:
+    sites = BindingSites([(3, 100), (102, 1000), (456, 1004), (600, 2000), (4, 20)])
+    print(sites.return_depth(3000))
+    print(len(sites.return_depth(3000)))

@@ -169,7 +169,8 @@ while True:
         print("unsupported for now")
 
     elif analysis_method == "sumOA":
-        print("unsupported for now")
+        # density_plot(bigStorage, RNAInfo, data_load_sources)
+        print("unsupported option...")
 
     print("")
     print("Thanks!")

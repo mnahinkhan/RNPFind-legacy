@@ -74,7 +74,7 @@ class FileSearcher(object):
         return current_line
 
 
-def binary_search_populate(file_path, storage_space, rna_info):
+def binary_search_populate(file_path, storage_space, rna_info, debug=False):
     RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord = rna_info
     query = Query((RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord))
     f = open(file_path)
@@ -82,9 +82,18 @@ def binary_search_populate(file_path, storage_space, rna_info):
     f.seek(bisect.bisect(search_file, query) + 1)
     s = f.readline().split()
     isFound = False
+    if debug:
+        seen = []
     while s:
         if s[0] == 'chr' + str(RNA_chr_no) and int(s[1]) > RNA_start_chr_coord and int(s[2]) < RNA_end_chr_coord:
             isFound = True
+
+            if debug:
+                if (s[7]) not in seen:
+                    print(';'.join(s))
+                    # print(s[7], s[10])
+                    seen += [s[7]]
+
             rbp = s[6]
             start, end = s[1], s[2]
             start = int(start) - RNA_start_chr_coord
@@ -166,7 +175,7 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
         # TODO: fix the implementation of overlap_collapse so annotations are not lost
         # Experimental data tends to contain extra binding sites that make them cover too much.
         # Let's filter them:
-        max_coverage = max([bindingsite.baseCover() for rbp, bindingsite in storageSpace.items()])
+        max_coverage = max([bindingsite.base_cover() for rbp, bindingsite in storageSpace.items()])
         # print(max_coverage, 'max_coverage!')
         allowed_coverage = experimental_binding_site_acceptable_coverage_ratio * max_coverage
         for binding_site in storageSpace.values():
@@ -182,17 +191,13 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
 
 if __name__ == '__main__':
     print("everything commented out!")
-    # file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
-    # RNA = "Malat1"
-    # RNA_chr_no = 21
-    # RNA_start_chr_coord = 15497688
-    # RNA_end_chr_coord = 15497688+30000
-    # rna_info = RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
-    # storage_space1 = {}
-    # storage_space2 = {}
-    #
-    # binary_search_populate1(file_path, storage_space1, rna_info)
-    # binary_search_populate2(file_path, storage_space2, rna_info)
-    #
-    # print(len(storage_space1))
-    # print(len(storage_space2)
+    file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
+    RNA = "PTEN"
+    RNA_chr_no = 10
+    RNA_start_chr_coord = 87863625
+    RNA_end_chr_coord = 87971930
+    rna_info = RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
+    storage_space1 = {}
+    storage_space2 = {}
+    binary_search_populate(file_path, storage_space1, rna_info, debug=True)
+    print(len(storage_space1))

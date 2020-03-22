@@ -6,11 +6,11 @@ threshold_cover_limit = 4000
 storage = computational_storage[rna]
 
 
-comp = list(map(lambda k: (k,storage[k].baseCover()),storage))
+comp = list(map(lambda k: (k,storage[k].base_cover()), storage))
 
 storage =  experimental_storage[rna]
 
-exp = list(map(lambda k: (k,storage[k].baseCover()),storage))
+exp = list(map(lambda k: (k,storage[k].base_cover()), storage))
 
 plt.plot(range(0,len(comp)),
 	list(map(lambda k: k[1],comp)),

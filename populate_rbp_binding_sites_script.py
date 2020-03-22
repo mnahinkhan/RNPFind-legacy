@@ -49,43 +49,21 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
             return red if competitive else green if cooperative else orange
 
         for rbp in storage:
-            # print(rbp)
-
-            # if rbp[:4] == "AUF1":
-            #     if data_load_source == "computational":
-            #         continue
-
-            # maxScoreReads = [max(map(lambda k: int(k[2].split()[1]), storage[rbp]))
-            #                  for storage in lncRNAstorages]
-            #
-            # lncRNA_sites = [(storage[[rbp]].printBED(
-            #     chrN=11, displacement=displacement, endInclusion=True, addAnnotation=True,
-            #     includeHeader=True, includeScore=True, scoreBase=maxScore, includeColor=True))
-            #     for storage, displacement, maxScore in zip(lncRNAstorages, lncRNA_displacements, maxScoreReads)]
-
-            # elif data_load_source == "computational" and "CUSTOM" in rbp:
-            #     continue
-
-            # else:
-
             total_sites = storage[[rbp]].printBED(
                 chrN=RNA_chr_no, displacement=displacement,
                 endInclusion=True, addAnnotation=True,
                 includeColor=True, includeHeader=False,
                 conditionalColor_func=(lambda t: coloring_func(storage, t)))
 
-            # total_sites = ''.join(lncRNA_sites)
-            # print(total_sites)
-
             filepath = rbp + ("_experimental" if data_load_source == "experimental" else "_computational") \
                                                                     + "_" + genome_version + "_sites.bed"
 
-            filepath = folder_path + "/" + filepath
+            filepath = folder_path + filepath
 
             try:
                 f = open(filepath, "w")
             except FileNotFoundError:
-                os.makedirs(folder_path + dir + "/")
+                os.makedirs(folder_path)
                 f = open(filepath, "w")
 
             f.write(total_sites)

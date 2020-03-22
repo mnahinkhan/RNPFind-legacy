@@ -1,4 +1,4 @@
-from config import dataload_sources_supported, dataload_sources_supported_internal
+from config import data_load_sources_supported, data_load_sources_supported_internal
 from config import analysis_methods_supported, analysis_methods_supported_internal
 from gene_coordinates import gene_to_coord
 
@@ -57,11 +57,11 @@ def user_input():
     print("Welcome to RNPFind!")
     print("")
     print("")
-    print("Which RNA gene would you like to analyse today?")
+    print("Which RNA transcript would you like to analyse today?")
     RNA = input()  # "Neat1"
 
     RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord = get_rna_coord(RNA)
-    return RNA, RNA_chr_no, int(RNA_start_chr_coord), int(RNA_end_chr_coord)
+    return RNA.upper(), RNA_chr_no, int(RNA_start_chr_coord), int(RNA_end_chr_coord)
 
 
 def user_data_source_preference():
@@ -69,14 +69,14 @@ def user_data_source_preference():
     print("")
     print("Which sources of data would you like to collect RBP binding data from today?")
     print("")
-    for i, source in enumerate(dataload_sources_supported):
+    for i, source in enumerate(data_load_sources_supported):
         print("[" + str(i) + "]: " + source)
     print("")
     print("You may choose any combination from above as you like (e.g. 124)")
     print(">")
     s = input()
     print("Thank you")
-    return [dataload_sources_supported_internal[int(i)] for i in s]
+    return [data_load_sources_supported_internal[int(i)] for i in s]
 
 
 def user_analysis_preference():
@@ -96,3 +96,10 @@ def user_analysis_preference():
         s = input()
     print("Thank you")
     return analysis_methods_supported_internal[int(s)]
+
+
+
+
+#MORE DATABASES
+#KEEP TRACK OF EACH
+#UCSC = ONE LINK MULTIPLE

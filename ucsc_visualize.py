@@ -1,5 +1,5 @@
 from populate_rbp_binding_sites_script import populate_binding_sites
-from populate_trackhub import populate_local_track_hub, convert_bed_to_bb, upload_online
+from populate_trackhub import populate_local_track_hub, convert_bed_to_bb, upload_online, density_plot, convert_wig_to_bw
 from config import genome_version
 
 
@@ -22,11 +22,22 @@ def ucsc_visualize(big_storage, rna_info, data_load_sources):
     convert_bed_to_bb(overarching_path, data_load_sources)
     print("Done!")
     print("")
-    print("uploading the bed files on a local track hub...")
+
+    print("Generating density plot for RBP binding...")
+    rbp_no_dict = density_plot(big_storage, rna_info, data_load_sources, overarching_path, return_rbp_no=True)
+    print("done!")
+    print("")
+
+    print("Converting all the wig files to bw files now...")
+    convert_wig_to_bw(overarching_path, data_load_sources)
+    print("Done!")
+    print("")
+
+    print("uploading the bigBed and bigWig files on a local track hub...")
     local_dir = "../ucsc-genome-track-fake/"
     date_time_folder_name = overarching_path.split("/")[-2]
     local_stage = local_dir + date_time_folder_name + "/"
-    hub_name = populate_local_track_hub(overarching_path, main_rbp, rna_info, local_stage)
+    hub_name = populate_local_track_hub(overarching_path, main_rbp, rna_info, local_stage, rbp_no_dict)
     print("done!")
 
     print("")
