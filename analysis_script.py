@@ -85,51 +85,21 @@ RNAInfo = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]
 data_load_sources = user_data_source_preference()
 print("Collecting data now...")
 
-# Link all of them to empty dictionaries
+# Stores data on binding sites for each data source.
 bigStorage = {}
-for data_load_source in data_load_sources:
-    bigStorage[data_load_source] = {}
-# Done
-
 
 # Now we start down each hierarchy:
 for data_load_source in data_load_sources:
-    # Affects storageSpace by side-effect
-    #######Loads computational and experimental data for#####
-    #######RBPs that bind the lncRNAs of interest##########
+    # Affects bigStorage by side-effect
+    # Loads computational and experimental data for RBPs that bind the lncRNA of interest
     load_data(data_load_source, synonym_func, bigStorage, RNAInfo)
 
 # LOADING DATA
 
-##########Getting the AUF1 PAR-CLIP Data##############
-# print("Obtaining PARCLIP Data on AUF1...")
-# filePath = ("../Raw Data/Nature Paper on AUF1 PARCLIP analysis/PARCLIP Data on Neat1 and Malat1.xlsx")
-# getAUF1ParClip(filePath, RNA, bigStorage['experimental'])
 
 print("complete!")
 
-# Now we want to filter some of the less important experimental binding sites of AUF1:
-# if filterTopSites:
-#     for container in filteredContainers:
-#         for rbp in filterRBPs:
-#             rnasites = bigStorage[container][rbp]
-#             bigStorage[container][rbp + "-unfiltered"] = rnasites
-#             bigStorage[container][rbp] = BindingSites(
-#                 sorted(rnasites, key=lambda k: int(k[2].split()[1]),
-#                        reverse=True)[:math.ceil(len(rnasites) * topSitesFilterPercentage)])
-
-# ########Getting the BIOGRID Data####################
-# print("Obtaining BIOGRID Data on AUF1...")
-# file_path_biogrid = '../Raw Data/BIOGRID/List of Proteins Binding to AUF1 Experimentally.xlsx'
-# file_path_hprd = '../Raw Data/BIOGRID/HPRD small List of Proteins Binding to AUF1 Experimentally.xlsx'
-# AUF1_proteins = getAUF1BioGrid(file_path_biogrid, file_path_hprd)
-#
-#
-# def AUF1Filter(gene):
-#     return any(x in gene.split(",") for x in AUF1_proteins)
-
-
-# print("complete!")
+# Todo: Consider using BIOGRID data in a meaningful way
 
 
 #################
