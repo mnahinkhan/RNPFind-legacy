@@ -1,5 +1,5 @@
 from config import data_load_sources_supported, data_load_sources_supported_internal
-from config import analysis_methods_supported, analysis_methods_supported_internal
+from analysis_functions import analysis_methods_supported, analysis_methods_supported_internal
 from gene_coordinates import gene_to_coord
 
 
@@ -90,7 +90,7 @@ def user_analysis_preference():
     print("Please pick just one analysis method and write the number associated with it (e.g. 3)")
     print(">")
     s = input()
-    while not (len(s) == 1 and s.isdigit()):
+    while not (len(s) == 1 and s.isdigit() and int(s) < len(analysis_methods_supported_internal)):
         print("Please pick just one analysis method and write the number associated with it (e.g. 3)")
         print(">")
         s = input()

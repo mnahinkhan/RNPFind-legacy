@@ -11,9 +11,14 @@ secondItem = itemgetter(1)
 thirdItem = itemgetter(2)
 
 
-def perBindingSiteAnalysis(bigStorage, AUF1Filter, analysis_per_binding_site_window,
-                           analysis_per_binding_site_competititive_range, analysis_sources):
+def perBindingSiteAnalysis(bigStorage, RNAInfo, data_load_sources):
+    #This function previously required these inputs
+    #bigStorage, AUF1Filter, analysis_per_binding_site_window,
+    #                       analysis_per_binding_site_competititive_range, analysis_sources):
     # Variable that comes useful later.
+    print("unimplemented for now!")
+    print("")
+    return
     #TODO: as stated in the error message below
     raise ValueError("This function needs to be reconsidered with respect to RNPFind and generalized for one template")
 

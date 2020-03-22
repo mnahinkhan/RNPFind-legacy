@@ -4,6 +4,10 @@
       <w>chrom</w>
       <w>hnrnpc</w>
       <w>hnrnpd</w>
+      <w>ncbi</w>
+      <w>postar</w>
+      <w>rbpdb</w>
+      <w>rbpmap</w>
       <w>ucsc</w>
       <w>uniprot</w>
     </words>

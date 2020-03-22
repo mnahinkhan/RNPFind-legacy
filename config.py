@@ -1,3 +1,5 @@
+
+
 # Building dictionary takes time. Set to false to use an identity function instead.
 
 dictionaryBuild = True
@@ -40,11 +42,6 @@ data_load_sources_supported = ['RBPDB (computational)', 'ATTRACT (computational)
 data_load_sources_supported_internal = ["RBPDB", "ATTRACT", "RBPMap", "experimental", "custom"]
 # TODO: Allow user-interactive selection of data_source selection
 
-
-analysis_methods_supported = ["Binding correlation analysis", "Per-binding-site analysis",
-                              "Visualize on UCSC Genome Browser", "Competition-Cooperation Visualization"]
-
-analysis_methods_supported_internal = ['binding', 'per_binding', 'ucsc', 'comp_coop']
 
 # Filter top sites on Neat1 and Malat1
 

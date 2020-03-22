@@ -48,6 +48,7 @@ from userInput import user_data_source_preference
 from userInput import user_analysis_preference
 from ucsc_visualize import ucsc_visualize
 from selector import select
+from analysis_functions import analysis_method_functions
 
 # Get some item getters ready for the rest of the journey:
 firstItem = itemgetter(0)
@@ -149,28 +150,8 @@ print("We are ready now")
 
 while True:
     analysis_method = user_analysis_preference()
-
-    if analysis_method == "binding":
-
-        overall_correlation_analysis(bigStorage, RNAInfo, data_load_sources)
-
-    elif analysis_method == "per_binding":
-        # TO DO DEAL WITH DATA SOURCES
-        print("I'm about to do per:")
-        # storageSpace = select(bigStorage, ['experimental'])
-        analysis_sources = ['experimental']
-        perBindingSiteAnalysis(bigStorage, AUF1Filter, analysis_per_binding_site_window,
-                               analysis_per_binding_site_competititive_range, analysis_sources)
-
-    elif analysis_method == "ucsc":
-        ucsc_visualize(bigStorage, RNAInfo, data_load_sources)
-
-    elif analysis_method == "comp_coop":
-        print("unsupported for now")
-
-    elif analysis_method == "sumOA":
-        # density_plot(bigStorage, RNAInfo, data_load_sources)
-        print("unsupported option...")
+    analysis_method_function = analysis_method_functions[analysis_method]
+    analysis_method_function(bigStorage, RNAInfo, data_load_sources)
 
     print("")
     print("Thanks!")
