@@ -1,5 +1,4 @@
 
-
 # Building dictionary takes time. Set to false to use an identity function instead.
 
 dictionaryBuild = True
@@ -38,8 +37,8 @@ experimental_binding_site_acceptable_coverage_ratio = 1  # Professor Ihab has de
 
 # For now, we support two types of data: experimental and computational
 data_load_sources_supported = ['RBPDB (computational)', 'ATTRACT (computational)', 'RBPMap (computational',
-                              'POSTAR (experimental)', 'User custom data']
-data_load_sources_supported_internal = ["RBPDB", "ATTRACT", "RBPMap", "experimental", "custom"]
+                               'POSTAR (experimental)', 'User custom data']
+data_load_sources_supported_short_form = ["rbpdb", "attract", "rbpmap", "postar", "custom"]
 # TODO: Allow user-interactive selection of data_source selection
 
 

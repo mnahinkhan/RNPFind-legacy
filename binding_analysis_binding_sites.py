@@ -375,6 +375,9 @@ class BindingSites():
         Note that binding sites can bind on the 0th nucleotide, and cannot bind on the length'th nucleotide """
 
         if length == -1:
+            if len(self) == 0:
+                raise ValueError("If the BindingSites object is empty, please do not call return_depth without "
+                                 "specifying the length parameter.")
             length = max(map(secondItem, self)) + 1
 
         # Stores 'depth' of support for each nucleotide in the

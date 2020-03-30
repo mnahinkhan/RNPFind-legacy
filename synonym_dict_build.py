@@ -14,7 +14,7 @@ def dealWithDictionaryBuilding():
 			ncbi_gene_files = [ncbi_gene_path + s for s in ncbi_gene_files]
 
 			synonym_dict = gene_synonyms.build(ncbi_gene_files)
-
+			#TODO: Consider rerouting this file to a better location
 			with open('gene_synonyms.pickle', 'wb') as handle:
 				pickle.dump(synonym_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 			

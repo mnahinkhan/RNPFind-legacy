@@ -5,10 +5,12 @@
       <w>chrom</w>
       <w>hnrnpc</w>
       <w>hnrnpd</w>
+      <w>ihab</w>
       <w>ncbi</w>
       <w>postar</w>
       <w>rbpdb</w>
       <w>rbpmap</w>
+      <w>sapiens</w>
       <w>ucsc</w>
       <w>uniprot</w>
     </words>

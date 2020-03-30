@@ -1,4 +1,4 @@
-from config import data_load_sources_supported, data_load_sources_supported_internal
+from config import data_load_sources_supported, data_load_sources_supported_short_form
 from analysis_functions import analysis_methods_supported, analysis_methods_supported_internal
 from gene_coordinates import gene_to_coord
 
@@ -12,7 +12,8 @@ def get_rna_coord(rna_gene_name):
     if is_success:
         deduction_attempt_made = True
         print("We have automatically deduced that this gene lies on chromosome " + str(RNA_chr_no) + " from " +
-              str(RNA_start_chr_coord) + " to " + str(RNA_end_chr_coord))
+              str(RNA_start_chr_coord) + " to " + str(RNA_end_chr_coord) + " (with length " +
+              str(RNA_end_chr_coord - RNA_start_chr_coord) + " bases)")
         print("Are you okay with the above coordinates? [y/n]: ")
         s = input()
         while len(s) != 1 or s.lower() not in "yn":
@@ -73,12 +74,12 @@ def user_data_source_preference():
         print("[" + str(i) + "]: " + source)
     print("")
     s = ""
-    while not (s.isdigit() and all([int(c) < len(data_load_sources_supported_internal) for c in s])):
+    while not (s.isdigit() and all([int(c) < len(data_load_sources_supported_short_form) for c in s])):
         print("Please choose any combination from above as you like (e.g. 124)")
         print(">")
         s = input()
     print("Thank you")
-    return [data_load_sources_supported_internal[int(i)] for i in s]
+    return [data_load_sources_supported_short_form[int(i)] for i in s]
 
 
 def user_analysis_preference():

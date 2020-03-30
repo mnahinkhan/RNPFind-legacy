@@ -29,44 +29,48 @@ def generate_heat_map(symmetric_corr_table, rna_info, data_load_sources, thresho
 
 # As of now, takes two rna arguments only.
 def overall_correlation_analysis(big_storage, rna_info, data_load_sources):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
 
-    secondItem = itemgetter(1)
+    print("For this analysis method, we need the nucleotide base distance stringency threshold number.")
+    print('''This number indicates the number of bases away that two binding sites can be before they are ''' +
+          '''considered "too far"''')
+    print("")
+    threshold = ""
+    while not threshold.isdigit():
+        print("Could you please type in your preferred base distance stringency threshold number? (e.g. 30)")
+        threshold = input(">")
+
+    threshold = int(threshold)
+    print("Thanks, this could take some time...")
+    symmetric_corr_tables = {}
     for data_load_source in data_load_sources:
         print("")
-        print("Starting with", data_load_source, "data...")
+        print("Working on ", data_load_source, "data...")
 
         storage = big_storage[data_load_source]
 
-        print("For this analysis method, we need the nucleotide base distance stringency threshold number.")
-        print('''This number indicates the number of bases away that two binding sites can be before they are ''' +
-              '''considered "too far"''')
-        print("")
-        threshold = ""
-        while not threshold.isdigit():
-            print("Could you please type in your preferred base distance stringency threshold number? (e.g. 30)")
-            threshold = input(">")
-
-        threshold = int(threshold)
-        print("Thanks, this could take some time...")
         _, symmetric_corr_table, _, _ = storage.self_analysis(bp_threshold=threshold)
+        symmetric_corr_tables[data_load_source] = symmetric_corr_table
         print("Done!")
 
-        output_type = ""
-        while output_type != "0" and output_type != "1" and output_type != "01" and output_type != "10":
-            print("We can either generate a csv file or show you a heat map, what would you prefer?")
-            print("[0]: Heat map")
-            print("[1]: CSV file")
-            print('''Write any combination [e.g. "01"]''')
-            output_type = input(">")
+    output_type = ""
+    while output_type != "0" and output_type != "1" and output_type != "01" and output_type != "10":
+        print("We can either generate a csv file or show you a heat map, what would you prefer?")
+        print("[0]: Heat map")
+        print("[1]: CSV file")
+        print('''Write any combination [e.g. "01"]''')
+        output_type = input(">")
 
-        if "1" in output_type:
-            print("Creating CSV file...")
-            path_saved = generate_csv(symmetric_corr_table, rna_info, data_load_sources, threshold)
-            print("Done!")
+    if "1" in output_type:
+        print("Creating CSV files...")
+        for data_load_source in data_load_sources:
+            symmetric_corr_table = symmetric_corr_tables[data_load_source]
+            path_saved = generate_csv(symmetric_corr_table, rna_info, [data_load_source], threshold)
             print("The file was saved at", path_saved + ".")
+        print("Done!")
 
-        if "0" in output_type:
-            print("Generating heat map...")
+    if "0" in output_type:
+        print("Generating heat map...")
+        for data_load_source in data_load_sources:
+            symmetric_corr_table = symmetric_corr_tables[data_load_source]
             generate_heat_map(symmetric_corr_table, rna_info, data_load_sources, threshold)
-            print("Done!")
+        print("Done!")

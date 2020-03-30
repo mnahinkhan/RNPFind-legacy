@@ -1,7 +1,7 @@
 import os
 import trackhub
 import glob
-from config import genome_version
+from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form
 
 
 def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks):
@@ -47,10 +47,10 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
         # TODO: consider options for this for the user (add to Config at least)
 
         track = trackhub.Track(
-            name=rbp + "_" + category,
-            short_label=rbp + "_" + ("comp" if category == "computational" else "exp"),
-            long_label=(("Computationally generated " if category == "computational"
-                         else "Experimentally verified ") + "binding sites of " + rbp),
+            name=rbp + "_" + category + "binding_sites",
+            short_label=rbp + "_" + category,
+            long_label=("Binding sites of " + rbp + " derived from " +
+                        data_load_sources_supported[data_load_sources_supported_short_form.index(category)]),
             source=filename,
             tracktype='bigBed 9',
             itemRgb="on",
@@ -63,22 +63,24 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
     for filename in glob.iglob(overarching_path + "**/*.bw", recursive=True):
         dots, directory1, directory2, data_load_source, name = filename.split("/")
         rbp_no = rbp_no_dict[data_load_source]
-        rbp_peak = rbp_peaks[data_load_source]
-        rbp_peak = (rbp_peak//10 + 1)*10
+        rbp_peak = max(rbp_peaks.values())
+        rbp_peak = (rbp_peak // 10 + 1) * 10
         visibility = "full"
         # TODO: consider options for this for the user (add to Config at least)
 
         track = trackhub.Track(
-            name=RNA,
-            short_label=RNA + " density plot",
-            long_label="Density plot of " + str(rbp_no) + " RBPs on " + RNA,
+            name=RNA + "_" + data_load_source + "_density_plot",
+            short_label="00 " + RNA + "_density",
+            long_label=("Density plot of " + str(rbp_no) + " RBPs on " + RNA + " using data from " +
+                        data_load_source.upper()),
             source=filename,
             tracktype='bigWig',
             color="128,0,0",  # TODO: what color ought bigWig density plots be?
             visibility=visibility,
             chromosomes="chr" + str(RNA_chr_no),
-            viewLimits="0:"+str(rbp_peak),
-            maxHeightPixels="128:50:8"
+            viewLimits="0:" + str(rbp_peak),
+            maxHeightPixels="128:50:8",
+            autoScale="on"
         )
 
         trackdb.add_tracks(track)
@@ -96,7 +98,7 @@ def convert_bed_to_bb(overarching_path, data_load_sources):
         os.system(
             '''for file in * .bed; do ../../../ucsc-tools/bedToBigBed type=bed9 "$file" ''' +
             '''../../../ucsc-tools/hg38.chrom.sizes "$file.bb"; done >/dev/null 2>&1''')
-    os.chdir(CUR)
+        os.chdir(CUR)
     return
 
 
@@ -152,5 +154,5 @@ def convert_wig_to_bw(overarching_path, data_load_sources):
             '''for file in *.wig; do ../../../ucsc-tools/wigToBigWig "$file" ../../../ucsc-tools/hg38.chrom.sizes ''' +
             '''"$file.bw"; done >/dev/null 2>&1'''
         )
-    os.chdir(CUR)
+        os.chdir(CUR)
     return

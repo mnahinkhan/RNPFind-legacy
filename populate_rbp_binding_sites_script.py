@@ -18,10 +18,7 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
 
         storage = big_storage[data_load_source]
 
-        folder_path = overarching_path + (
-            "experimental/"
-            if data_load_source == "experimental"
-            else "computational/")
+        folder_path = overarching_path + data_load_source + "/"
 
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
@@ -55,8 +52,7 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
                 includeColor=True, includeHeader=False,
                 conditionalColor_func=(lambda t: coloring_func(storage, t)))
 
-            filepath = rbp + ("_experimental" if data_load_source == "experimental" else "_computational") \
-                                                                    + "_" + genome_version + "_sites.bed"
+            filepath = rbp + "_" + data_load_source + "_" + genome_version + "_sites.bed"
 
             filepath = folder_path + filepath
 

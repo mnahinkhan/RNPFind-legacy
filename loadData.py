@@ -1,34 +1,12 @@
+import pickle
+
 from merge_annotation_funcs import generate_merge_func
 from bind_analysis import BindingSites, Storage
 import os  # sometimes you gotta browse files
 from config import experimental_binding_site_acceptable_coverage_ratio
 from custom_binding_data import custom_data
 import bisect
-
-
-# from analysis_script import
-# def binary_search_populate1(file_path, storage_space, rna_info):
-#     RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord = rna_info
-#     f = open(file_path)
-#     s = f.readline().split()
-#     isFound = False
-#     while s:
-#         if s[0] == 'chr' + str(RNA_chr_no) and int(s[1]) > RNA_start_chr_coord and int(s[2]) < RNA_end_chr_coord:
-#             isFound = True
-#             rbp = s[6]
-#             start, end = s[1], s[2]
-#             start = int(start) - RNA_start_chr_coord
-#             end = int(end) - RNA_start_chr_coord
-#
-#             if rbp not in storage_space:
-#                 storage_space[rbp] = BindingSites(overlap_mode=True)
-#
-#             storage_space[rbp].add((start, end, ";".join([s[i] for i in [3, 4, 5, 7, 8, 9, 10]])))
-#
-#         elif isFound:
-#             break
-#
-#         s = f.readline().split()
+from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan
 
 
 class Query(object):
@@ -102,12 +80,52 @@ def binary_search_populate(file_path, storage_space, rna_info, debug=False):
             if rbp not in storage_space:
                 storage_space[rbp] = BindingSites(overlap_mode=True)
 
-            storage_space[rbp].add((start, end, ";".join([s[i] for i in [3, 4, 5, 7, 8, 9, 10]])))
+            # TODO: Consider reformatting the annotation for visual appeal
+            annotation = ", ".join([s[i] for i in [3, 4, 5, 7, 8, 9, 10]])
+            storage_space[rbp].add((start, end, annotation))
 
         elif isFound:
             break
 
         s = f.readline().split()
+
+
+def generate_matrix_to_pwm_pickle(pickle_path):
+    attract_pwm_file_path = "../Raw Data/ATTRACT PWMs/pwm.txt"
+    print("did i get here")
+    matrix_to_pwm_dict = {}
+    with open(attract_pwm_file_path) as handle:
+        s = handle.readline()
+        while s:
+            matrix_id = s.split()[0][1:]
+            print(matrix_id)
+            # while s[:1 + len(matrix_id)] != ">" + matrix_id:
+            #     s = handle.readline()
+            raw_pwm_str = ""
+            s = handle.readline()
+            while s and s[0] != ">":
+                raw_pwm_str += s
+                s = handle.readline()
+            # Now we have the raw text, we convert it to pwm and add to dictionary
+            matrix_to_pwm_dict[matrix_id] = pwm_str_to_dict(raw_pwm_str)
+
+    with open(pickle_path, 'wb') as handle:
+        pickle.dump(matrix_to_pwm_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def get_attract_pwm():
+    pickle_path = "../Raw Data/ATTRACT PWMs/matrix_id_to_pwm.pickle"
+    try:
+        with open(pickle_path, 'rb') as handle:
+            matrix_to_pwm_dict = pickle.load(handle)
+    except:
+        generate_matrix_to_pwm_pickle(pickle_path)
+        with open(pickle_path, 'rb') as handle:
+            matrix_to_pwm_dict = pickle.load(handle)
+
+    return matrix_to_pwm_dict
+
+
 
 
 def load_data(data_load_source, synonym_func, big_storage, rna_info):
@@ -122,82 +140,114 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
     big_storage[data_load_source] = Storage(synonym_func=synonym_func, annotation_merge_func=merge_func)
     storageSpace = big_storage[data_load_source]
 
-    if data_load_source == 'computational':
-        raise ValueError("This function has been deprecated for now")
-        # Now we populate the dictionaries with data from the various sources:
+    if data_load_source == 'attract':
+        attract_protein_file_path = "../Raw Data/ATTRACT PWMs/ATtRACT_db.txt"
+        # print("Getting the RNA Seq...")
+        rna_seq = get_human_seq(RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord)
+        # print("Done")
+        matrix_to_pwm_dict = get_attract_pwm()
+        with open(attract_protein_file_path) as handle:
+            # print("Let's read the attract protein file")
+            columns = handle.readline().strip().split('\t')
+            # print(columns)
+            assert (columns == ["Gene_name", "Gene_id", "Mutated", "Organism", "Motif", "Len", "Experiment_description",
+                                "Database", "Pubmed", "Experiment_description", "Family", "Matrix_id", "Score"])
+            s = handle.readline().split('\t')
+            while s != ['']:
+                # Warning: Score ends with \n here, maybe remove using strip or indexing. For now, we don't care about
+                # score as it seems to be about literature
 
-        # There are eight main files:
-        path: str = "../Raw Data/NEAT1 Proteins/"
-        file_paths = ["ATTRACT Proteins that Bind to NEAT1 FIRST HALF.xlsx",
-                      "ATTRACT Proteins that Bind to NEAT1 SECOND HALF.xlsx",
-                      "RBPDB Proteins that bind to NEAT1 FIRST THIRD.xlsx",
-                      "RBPDB Proteins that bind to NEAT1 SECOND THIRD.xlsx",
-                      "RBPDB Proteins that bind to NEAT1 THIRD THIRD.xlsx",
-                      "misc/RBPMap First THIRD predictions.txt",
-                      "misc/RBPMap SECOND THIRD predictions.txt",
-                      "misc/RBPMap THIRD THIRD predictions.txt"]
-        file_paths = [path + s for s in file_paths]
-        # To account for the basepair numberings (misalignment manually verified):
-        mis_alignments = [1, 11100, 0, 7400, 14900, 0, 7400, 14900]
+                # We only care about human RBPs for now.
+                if s[3] != "Homo_sapiens":
+                    s = handle.readline().split('\t')
+                    continue
+                annotation = ", ".join([columns[i] + ": " + s[i] for i in [2, 6, 7, 8, 9, 10]]) + \
+                             ", Q-score: " + s[12][:-1]
 
-        # The eight files come from various sources:
-        data_sources = ["ATTRACT"] * 2 + ["RBPDB"] * 3 + ["RBPMap"] * 3
+                rbp = s[0]
+                # print("Getting data for", rbp)
+                matrix_id = s[11]
+                # print("Let's get the PWM")
+                pwm = matrix_to_pwm_dict[matrix_id]
+                # print("Done!")
+                # print("Let's get the sites now")
+                sites = pwm_scan(rna_seq, pwm)
+                # print("done!")
 
-        print("Populating Neat1 RBPs...")
-        # Convenient function:
-        storageSpace['Neat1'].populate(file_paths, mis_alignments, data_sources)
-        print("complete!")
+                if not sites:
+                    s = handle.readline().split('\t')
+                    continue
 
-        # Same action, but for MALAT1:
-        # There are only three files this time:
-        path = "../Raw Data/MALAT1 Proteins/"
-        file_paths = ["ATTRACT Proteins that Bind to MALAT1.xlsx",
-                      "RBPDB Proteins that bind to MALAT1.xlsx",
-                      "misc/RBPMap Proteins that Bind to MALAT1.txt"]
-        file_paths = [path + s for s in file_paths]
-        # To account for the basepair numberings (misalignment manually verified):
-        mis_alignments = [1, 0, 0]
+                if rbp not in storageSpace:
+                    storageSpace[rbp] = BindingSites(overlap_mode=True)
 
-        # The eight files come from various sources:
-        data_sources = ["ATTRACT"] * 1 + ["RBPDB"] * 1 + ["RBPMap"] * 1
+                for start, end in sites:
+                    storageSpace[rbp].add((start, end, annotation))
 
-        print("Populating Malat1 RBPs...")
-        # Convenient function:
-        storageSpace['Malat1'].populate(file_paths, mis_alignments, data_sources)
-        print("complete!")
-
-    elif data_load_source == 'experimental':
-
+                s = handle.readline().split('\t')
+                # print("done!")
+    elif data_load_source == 'postar':
         file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
-
         binary_search_populate(file_path, storageSpace, rna_info)
-
-        # TODO: fix the implementation of overlap_collapse so annotations are not lost
-        # Experimental data tends to contain extra binding sites that make them cover too much.
-        # Let's filter them:
-        max_coverage = max([bindingsite.base_cover() for rbp, bindingsite in storageSpace.items()])
-        # print(max_coverage, 'max_coverage!')
-        allowed_coverage = experimental_binding_site_acceptable_coverage_ratio * max_coverage
-        for binding_site in storageSpace.values():
-            binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, inPlace=True)
 
     elif data_load_source == 'custom':
         # for rna in listofRNAs:
         for rbp, binding_sites in custom_data[RNA].items():
             storageSpace[rbp] = BindingSites(binding_sites)
     else:
+        print(data_load_source)
         raise ValueError("Dataload source not set correctly")
+
+    # Now we merge all the binding sites that overlap.
+    # TODO: fix the implementation of overlap_collapse so annotations are not lost
+
+    # print("Getting max coverage")
+    max_coverage = max([bindingsite.base_cover() for rbp, bindingsite in storageSpace.items()])
+    # storageSpace.summary()
+    # print("Now individually filtering...")
+    allowed_coverage = experimental_binding_site_acceptable_coverage_ratio * max_coverage
+    for binding_site in storageSpace.values():
+        # print("filtering", binding_site)
+        binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, inPlace=True)
 
 
 if __name__ == '__main__':
     print("everything commented out!")
-    file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
-    RNA = "PTEN"
-    RNA_chr_no = 10
-    RNA_start_chr_coord = 87863625
-    RNA_end_chr_coord = 87971930
-    rna_info = RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
-    storage_space1 = {}
-    storage_space2 = {}
-    binary_search_populate(file_path, storage_space1, rna_info, debug=True)
-    print(len(storage_space1))
+    # file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
+    # RNA = "PTEN"
+    # RNA_chr_no = 10
+    # RNA_start_chr_coord = 87863625
+    # RNA_end_chr_coord = 87971930
+    # rna_info = RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
+    # storage_space1 = {}
+    # storage_space2 = {}
+    # binary_search_populate(file_path, storage_space1, rna_info, debug=True)
+    # print(len(storage_space1))
+    from synonym_dict_build import dealWithDictionaryBuilding
+    from timeit import default_timer as timer
+    from userInput import user_input
+
+    test_my_own_rna = True
+    synonym_func = dealWithDictionaryBuilding()
+    big_storage = {}
+
+    if test_my_own_rna:
+        [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
+    else:
+        RNA = "MALAT1"
+        RNA_chr_no = 11
+        RNA_start_chr_coord = 65497688
+        RNA_end_chr_coord = 65506516
+
+    rna_info = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]
+
+    for method in ["attract", "postar"]:
+        print("Testing", method, "retrieval")
+        start= timer()
+        load_data(method, synonym_func, big_storage, rna_info)
+        print("done!")
+        end = timer()
+        print("Time taken for", method, ":", end-start)
+
+
+

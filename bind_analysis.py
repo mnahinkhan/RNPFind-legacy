@@ -91,6 +91,7 @@ class Storage:
     def __getitem__(self, item):
         if type(item) is str:
             item = item.upper()
+            item = item.strip()
             if item in self._RBPs:
                 return self._RBPs[item]
             else:
@@ -130,6 +131,7 @@ class Storage:
         if (type(item) is str and
                 type(value) is BindingSites):
             item = item.upper()
+            item = item.strip()
             self._RBPs[item] = value
             self.corr_reset()
 
