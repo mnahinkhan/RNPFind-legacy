@@ -59,7 +59,6 @@ class BindingSites():
         for site in l:
             self.add(site)
 
-
     def __repr__(self, dispMeta=False):
         """Representation of BindingSites objects.
 
@@ -155,7 +154,10 @@ class BindingSites():
                              "(start, end, annotation)")
 
         start, end, metadata = new_site
+        if type(start) is not int or type(end) is not int:
+            raise ValueError("Please make sure start and end are integers")
 
+        # print('s',start,'e',end,'m',metadata)
         if start > end:
             raise ValueError(
                 "Please make sure the interval end point is greater than the start point!")
@@ -265,19 +267,19 @@ class BindingSites():
 
         if pos == 0:  # tuple at the beginning
             dist_end = self.sorted_sites[pos][0] - end
-            return (self.sorted_sites[pos], max(0, dist_end))
+            return self.sorted_sites[pos], max(0, dist_end)
 
         elif pos == len(self.sorted_sites):  # tuple at the end
             dist_start = start - self.sorted_sites[pos - 1][1]
-            return (self.sorted_sites[pos - 1], max(0, dist_start))
+            return self.sorted_sites[pos - 1], max(0, dist_start)
 
         else:  # tuple in the middle
             dist_start = start - self.sorted_sites[pos - 1][1]
             dist_end = self.sorted_sites[pos][0] - end
             if dist_start > dist_end:
-                return (self.sorted_sites[pos], max(0, dist_end))
+                return self.sorted_sites[pos], max(0, dist_end)
             else:
-                return (self.sorted_sites[pos - 1], max(0, dist_start))
+                return self.sorted_sites[pos - 1], max(0, dist_start)
 
     def distance(p, q):
         if BindingSites.isOverlapRanges(p, q): return 0
@@ -397,7 +399,7 @@ class BindingSites():
 
         return binding_depth
 
-    def overlap_collapse(self, mode, number, inPlace=False):
+    def overlap_collapse(self, mode, number, inPlace=False, annotation_merger=-1):
         """Collapses the overlapping ranges to non-overlapping ones, based on preset
         conditions.
 
@@ -475,6 +477,7 @@ class BindingSites():
         else:
             raise ValueError("The mode selected, '" + mode + "' is not supported!")
 
+        sites = self.sorted_sites
         depth_cutoff = max(0, depth_cutoff)
         if inPlace:
             self.overlap_mode = False
@@ -504,16 +507,15 @@ class BindingSites():
             binding_site_to_add_to.add(
                 (startRange, endRange))
 
+        # Add annotations
+        for site in sites:
+            start, end, annotation = site
+            print(start, end, annotation)
+            site, distance = binding_site_to_add_to.nearestSite(site)
+            if distance == 0:
+                binding_site_to_add_to.add((start, end, annotation), annotation_merger)
         if not inPlace:
             return binding_site_to_add_to
-
-        # code junk
-        '''
-        [comp_d[j][0] for j in range(len(comp_d)) if len(list(filter(lambda k: k>0,comp_d[j][1])))>7000]
-
-        len(list(filter(lambda k: k>12,comp_d[45][1])))
-        [d[j][2] for j in range(len(d))]
-        '''
 
     def base_cover(self):
         depth_array = self.return_depth()
@@ -548,6 +550,16 @@ class BindingSites():
 
 if __name__ == "__main__":
     # testing return_depth here:
-    sites = BindingSites([(3, 100), (102, 1000), (456, 1004), (600, 2000), (4, 20)])
+    sites = BindingSites([(3, 100, "my name"), (102, 1000, "hey this is nahin"), (456, 1004, "What's good"),
+                          (600, 2000, "more random stuff"), (4, 20, "What's good")])
     print(sites.return_depth(3000))
     print(len(sites.return_depth(3000)))
+
+    # testing overlap mode capabilities
+    overlap_sites = BindingSites([(3, 100, "my name"), (102, 1000, "hey this is nahin"), (456, 1004, "What's good"),
+                                  (600, 2000, "more random stuff"), (4, 20, "What's good")], overlap_mode=True)
+    print(overlap_sites.return_depth(3000))
+    print(len(overlap_sites.return_depth(3000)))
+    print(sites)
+    print(overlap_sites)
+    print(overlap_sites.overlap_collapse('TopDepthRatio', 1.0, annotation_merger=lambda t: '; '.join(t)))
