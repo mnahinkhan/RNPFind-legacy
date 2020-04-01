@@ -126,8 +126,6 @@ def get_attract_pwm():
     return matrix_to_pwm_dict
 
 
-
-
 def load_data(data_load_source, synonym_func, big_storage, rna_info):
     # FIRST PART: RBP Binding sites on a template RNA molecule.
     # We will store all data in a dictionary called storageSpace['Neat1'], mapping gene names
@@ -243,11 +241,8 @@ if __name__ == '__main__':
 
     for method in ["attract", "postar"]:
         print("Testing", method, "retrieval")
-        start= timer()
+        start = timer()
         load_data(method, synonym_func, big_storage, rna_info)
         print("done!")
         end = timer()
-        print("Time taken for", method, ":", end-start)
-
-
-
+        print("Time taken for", method, ":", end - start)

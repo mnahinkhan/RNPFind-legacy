@@ -53,9 +53,12 @@ class BindingSites():
     # If overlap_collapse() is called too soon, everything has to be loaded again fresh.
 
     def __init__(self, l=[], overlap_mode=False):
-        # Just a sorted set underneath
-        self.sorted_sites = SortedSet(l)
         self.overlap_mode = overlap_mode
+        # Just a sorted set underneath
+        self.sorted_sites = SortedSet()
+        for site in l:
+            self.add(site)
+
 
     def __repr__(self, dispMeta=False):
         """Representation of BindingSites objects.
@@ -94,7 +97,7 @@ class BindingSites():
 
     def _merge_meta(l, f=-1):
         # assert(not self.overlap_mode)
-
+        # TODO: fix the poor style of this function
         """Internal function for merging the annotations of multiple
         binding site ranges"""
 
@@ -406,7 +409,7 @@ class BindingSites():
         'TopDepthNumber', 'MinimumDepthNumber', 'TopSitesNumber','TopSitesRatio'
 
             'baseCoverNumber': Choose cut off based on number of bases that should be
-                covered by the selected sites. The stringest cutoff that achieves this
+                covered by the selected sites. The most stringent cutoff that achieves this
                 criteria is selected, unless not possible*.
 
             'TopDepthRatio': Choose cutoff based on the fraction of highest depth
