@@ -1,18 +1,25 @@
 from datetime import datetime
 import os
-from config import genome_version
+from config import genome_version, dedicated_analysis
 from loadData import data_source_annotation_to_columns
+
+
+def get_overarching_path(RNA):
+    if not dedicated_analysis:
+        year, month, day, hour, min, sec, x, y, z = datetime.now().timetuple()
+        year, month, day, hour, min, sec = [str(x) for x in [year, month, day, hour, min, sec]]
+        time_date = "_".join([year, month, day, hour, min, sec])
+    else:
+        time_date = RNA
+    return "../rbp_binding_sites_bed_files/" + time_date + "/"
 
 
 def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
 
     displacement = RNA_start_chr_coord
-    year, month, day, hour, min, sec, x, y, z = datetime.now().timetuple()
-    year, month, day, hour, min, sec = [str(x) for x in [year, month, day, hour, min, sec]]
-    time_date = "_".join([year, month, day, hour, min, sec])
 
-    overarching_path = "../rbp_binding_sites_bed_files/" + time_date + "/"
+    overarching_path = get_overarching_path(RNA)
 
     for data_load_source in data_load_sources:
         print("starting!", data_load_source)

@@ -1,4 +1,3 @@
-
 # Building dictionary takes time. Set to false to use an identity function instead.
 
 dictionaryBuild = True
@@ -54,3 +53,7 @@ topSitesFilterPercentage = 0.30
 genome_version = 'hg38'
 
 ucsc_track_visibility = "pack"
+
+# This should be False normally. Only set to True if you want to make a dedicated directory for your RNA of interest.
+# Note that this flag only affects UCSC browser visualization method.
+dedicated_analysis = True
