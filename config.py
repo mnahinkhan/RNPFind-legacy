@@ -56,4 +56,4 @@ ucsc_track_visibility = "pack"
 
 # This should be False normally. Only set to True if you want to make a dedicated directory for your RNA of interest.
 # Note that this flag only affects UCSC browser visualization method.
-dedicated_analysis = True
+dedicated_analysis = False
