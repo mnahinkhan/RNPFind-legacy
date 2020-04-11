@@ -52,3 +52,5 @@ topSitesFilterPercentage = 0.30
 
 # Genome version being used
 genome_version = 'hg38'
+
+ucsc_track_visibility = "pack"

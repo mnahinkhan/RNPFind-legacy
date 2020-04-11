@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from config import genome_version
+from loadData import data_source_annotation_to_columns
 
 
 def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
@@ -46,11 +47,11 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
             return red if competitive else green if cooperative else orange
 
         for rbp in storage:
-            total_sites = storage[[rbp]].printBED(
-                chrN=RNA_chr_no, displacement=displacement,
-                endInclusion=True, addAnnotation=True,
-                includeColor=True, includeHeader=False,
-                conditionalColor_func=(lambda t: coloring_func(storage, t)))
+            total_sites = storage[[rbp]].printBED(chrN=RNA_chr_no, displacement=displacement, endInclusion=True,
+                                                  addAnnotation=True, includeColor=True, includeHeader=False,
+                                                  conditionalColor_func=(lambda t: coloring_func(storage, t)),
+                                                  is_additional_columns=True, annotation_to_additional_columns=
+                                                  data_source_annotation_to_columns[data_load_source])
 
             filepath = rbp + "_" + data_load_source + "_" + genome_version + "_sites.bed"
 

@@ -1,7 +1,8 @@
 import os
 import trackhub
 import glob
-from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form
+from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form, ucsc_track_visibility
+from loadData import prepare_auto_sql, column_data
 
 
 def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks):
@@ -43,7 +44,7 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
         rbp = rbp.replace("(", "")
         rbp = rbp.replace(")", "")
 
-        visibility = "dense"
+        visibility = ucsc_track_visibility
         # TODO: consider options for this for the user (add to Config at least)
 
         track = trackhub.Track(
@@ -52,12 +53,22 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
             long_label=("Binding sites of " + rbp + " derived from " +
                         data_load_sources_supported[data_load_sources_supported_short_form.index(category)]),
             source=filename,
-            tracktype='bigBed 9',
+            tracktype='bigBed 9 +',
             itemRgb="on",
             spectrum="on",
             visibility=visibility,
-            chromosomes="chr" + str(RNA_chr_no)
+            chromosomes="chr" + str(RNA_chr_no),
+            # labelFields="",
+            # defaultLabelFields="",
+            # mouseOverField=""
+            # labelFields=",".join([column_data[category]["names"][i] for i in column_data[category]["interest"]]),
+            # defaultLabelFields=",".join(
+            #     [column_data[category]["names"][i] for i in column_data[category]["default_label"]]),
+            # mouseOverField=column_data[category]["names"][column_data[category]["default_mouse_over"]],
+            # maxItems=25
+
         )
+        # TODO: Add options for mouse hover views of information
 
         trackdb.add_tracks(track)
     for filename in glob.iglob(overarching_path + "**/*.bw", recursive=True):
@@ -94,10 +105,13 @@ def convert_bed_to_bb(overarching_path, data_load_sources):
 
     CUR = os.getcwd()
     for data_load_source in data_load_sources:
+        no_of_extra_fields, as_file_name = prepare_auto_sql(data_load_source)
         os.chdir(overarching_path + data_load_source + "/")
+
         os.system(
-            '''for file in * .bed; do ../../../ucsc-tools/bedToBigBed type=bed9 "$file" ''' +
-            '''../../../ucsc-tools/hg38.chrom.sizes "$file.bb"; done >/dev/null 2>&1''')
+            "for file in * .bed; do ../../../ucsc-tools/bedToBigBed -as=../../../autosql_files/" + as_file_name +
+            " type=bed9+" + str(no_of_extra_fields) + ' "$file" ' +
+            '../../../ucsc-tools/hg38.chrom.sizes "$file.bb"; done >/dev/null 2>&1')
         os.chdir(CUR)
     return
 

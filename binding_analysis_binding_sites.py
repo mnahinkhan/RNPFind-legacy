@@ -9,11 +9,10 @@ thirdItem = itemgetter(2)
 overlap_conflict = 'union'
 
 
-# To-do, remove the above and fix dependencies
-
-
-# To-do: implement a feature that allows belonging relationship to mean overlap over the structure...
+# Todo: remove the above and fix dependencies
+# Todo: implement a feature that allows belonging relationship to mean overlap over the structure...
 # Todo: implement a map function
+# Todo: Go through the class functions and change replace "-1" default arguments with "None" instead
 class BindingSites():
     # Note that, in order to store binding sites in an ordered and non-redundant fashion from
     # multiple sources, a BindingSites class was implemented here.
@@ -103,11 +102,19 @@ class BindingSites():
         # Get all the annotations first from the input list
         new_l = []
         for element in l:
+            if element is None:
+                continue
             if type(element) is tuple:
                 for el in element:
                     new_l.append(el)
             else:
                 new_l.append(element)
+
+        if len(new_l) == 0:
+            return None
+
+        if len(new_l) == 1:
+            return new_l[0]
 
         # Use user-defined function to merge the list of
         # annotations
@@ -116,6 +123,9 @@ class BindingSites():
 
         # Otherwise, make a tuple of it, unless its just one element
         new_l_set = set(new_l)
+
+        assert (len(new_l_set) > 1)
+
         if len(new_l_set) > 1:
             return tuple(new_l_set)
         else:
@@ -148,7 +158,7 @@ class BindingSites():
 
         if len(new_site) == 2:
             p, q = new_site
-            new_site = (p, q, "")
+            new_site = (p, q, None)
         elif len(new_site) != 3:
             raise ValueError("Please keep three values in the tuple: " +
                              "(start, end, annotation)")
@@ -315,9 +325,9 @@ class BindingSites():
                 outputBindingSites.add(site)
         return outputBindingSites
 
-    def printBED(self, name="Generic Binding Site", chrN=1, displacement=0,
-                 endInclusion=False, addAnnotation=False, includeScore=False, scoreMax=1000,
-                 scoreBase=1000, includeColor=False, conditionalColor_func=-1, isBar=False):
+    def printBED(self, name="Generic Binding Site", chrN=1, displacement=0, endInclusion=False, addAnnotation=False,
+                 includeScore=False, scoreMax=1000, scoreBase=1000, includeColor=False, conditionalColor_func=-1,
+                 isBar=False, is_additional_columns=False, annotation_to_additional_columns=None):
         # TOdo: Possibly remove the functionality for isBar, it seems misplaced!
         outputStr = ""
         if type(chrN) is not str:
@@ -326,13 +336,17 @@ class BindingSites():
             chrN = ("chr" + chrN) if chrN[:3] != "chr" else chrN
 
         for _tuple in self.sorted_sites:
-            start, end, *m = _tuple
+            start, end, annotation = _tuple
             start, end = displacement + start, (displacement + end +
                                                 (1 if endInclusion else 0))
 
-            namedisp = name + ((": " + str(m)[1:-1]) if addAnnotation else "")
-            namedisp = namedisp.replace(" ", "_")
+            # namedisp = name + ((": " + str(m)[1:-1]) if addAnnotation else "")
+            # namedisp = namedisp.replace(" ", "_")
+            # import random
+            # namedisp = ", ".join(random.choices('abcdefghijklmnopqrstuuvwxyz',k=10))
 
+            # namedisp = m.replace(" ", "")
+            namedisp = name
             toJoin = [chrN, start, end, namedisp]
 
             if includeColor and not includeScore:
@@ -340,14 +354,14 @@ class BindingSites():
                 toJoin.append(score)
             elif includeScore:
 
-                assert (len(m) == 1)
+                assert (len(annotation) == 1)
                 # if len(m)!=1:
                 # 	print(m)
                 # 	print(len(m))
                 # 	raise ValueError("Check this out")
 
                 score = float("".join(filter(
-                    lambda k: k.isdigit() or k == "." or k == "-", m[0])))
+                    lambda k: k.isdigit() or k == "." or k == "-", annotation[0])))
                 score = int(score / scoreBase * scoreMax)
                 toJoin.append(score)
 
@@ -370,6 +384,8 @@ class BindingSites():
                 number_of_bars = 1
                 toJoin += [strand, name, number_of_bars, score]
 
+            if is_additional_columns:
+                toJoin += [s.replace(" ", "_") for s in annotation_to_additional_columns(annotation)]
             outputStr += "\t".join(map(str, toJoin)) + "\n"
 
         return outputStr
@@ -510,7 +526,7 @@ class BindingSites():
         # Add annotations
         for site in sites:
             start, end, annotation = site
-            print(start, end, annotation)
+            # print(start, end, annotation)
             site, distance = binding_site_to_add_to.nearestSite(site)
             if distance == 0:
                 binding_site_to_add_to.add((start, end, annotation), annotation_merger)
@@ -563,3 +579,5 @@ if __name__ == "__main__":
     print(sites)
     print(overlap_sites)
     print(overlap_sites.overlap_collapse('TopDepthRatio', 1.0, annotation_merger=lambda t: '; '.join(t)))
+
+    # sites = BindingSites([(3, 100, {'d': 4, 'e': 5}), (102, 1000, "hey this is nahin"), (456, 1004, "What's good")])

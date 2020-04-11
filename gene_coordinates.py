@@ -168,5 +168,16 @@ def gene_to_coord(gene):
 
 
 if __name__ == "__main__":
-    name_to_official, official_to_coord = file_to_dicts(path_to_bio_mart)
-    print(official_to_coord[name_to_official["NEAT1"]])
+    import itertools
+
+    with open(path_to_pickle, 'rb') as handle:
+        nameToOfficial, officialToCoord = pickle.load(handle)
+
+        length_wanted = 1000
+        for g in map(''.join, itertools.product('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', repeat=5)):
+            #print(g)
+            if g in nameToOfficial and nameToOfficial[g] in officialToCoord:
+                c,s,e = list(officialToCoord[nameToOfficial[g]])
+                if 4000 > e-s > 1000:
+                    print(e-s)
+                    print(g)

@@ -8,6 +8,64 @@ from custom_binding_data import custom_data
 import bisect
 from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan
 
+postar_column_types = ["string", "int", "int", "string", "int", "string", "string", "string", "string", "string",
+                       "float"]
+postar_column_names = ["chrom", "chromStart", "chromEnd", "postarID", "nil", "strand", "rbpName", "dataSource",
+                       "cellType", "expSource", "postarScore"]
+postar_column_descriptions = ["chromosome number", "start coordinate", "end coordinate", "POSTAR database ID",
+                              "not sure", "strand", "RBP Name", "Data Source", "Cell type", "experimental source",
+                              "score"]
+
+postar_columns_of_interest = [3, 7, 8, 9, 10]
+postar_default_label_index = [8]
+postar_default_mouse_over_index = 9
+
+attract_column_names = ["Gene_name", "Gene_id", "Mutated", "Organism", "Motif", "Len", "Experiment_description",
+                        "Database", "Pubmed", "Experiment", "Family", "Matrix_id", "attractScore"]
+attract_descriptions = attract_column_names
+attract_columns_of_interest = [2, 4, 6, 7, 8, 9, 10, 11, 12]
+attract_default_label_index = [8]
+attract_default_mouse_over_index = 9
+
+column_data = {"postar": {"names": postar_column_names, "default_label": postar_default_label_index,
+                          "interest": postar_columns_of_interest,
+                          "default_mouse_over": postar_default_mouse_over_index,
+                          "descriptions": postar_column_descriptions},
+
+               "attract": {"names": attract_column_names, "default_label": attract_default_label_index,
+                           "interest": attract_columns_of_interest,
+                           "default_mouse_over": attract_default_mouse_over_index,
+                           "descriptions": attract_descriptions}
+               }
+annotation_row_delimiter = ";;;;;"
+
+
+# TODO: Reorganize into multiple files, one for each method, with standardized form
+
+
+def prepare_auto_sql(data_load_source):
+    source_columns_of_interest = column_data[data_load_source]["interest"]
+    no_of_extra_fields = len(source_columns_of_interest)
+    name_of_file = data_load_source + "".join([str(c) for c in source_columns_of_interest]) + ".as"
+    file_path = "../autosql_files/" + name_of_file
+    template_file_path = "../autosql_files/" + data_load_source + "_template.as"
+    try:
+        open(file_path, 'r').close()
+    except:
+        with open(file_path, 'w') as handle:
+            with open(template_file_path, "r") as template_handle:
+                template_string = template_handle.read()
+
+            handle.write(template_string)
+            column_names = [column_data[data_load_source]["names"][i] for i in source_columns_of_interest]
+            descriptions = [column_data[data_load_source]["descriptions"][i] for i in source_columns_of_interest]
+            additional_str = ""
+            for column, description in zip(column_names, descriptions):
+                additional_str += "\t".join(["lstring", column + ";", '"' + description + '"']) + "\n"
+            additional_str += ")"
+            handle.write(additional_str)
+    return no_of_extra_fields, name_of_file
+
 
 class Query(object):
 
@@ -52,7 +110,11 @@ class FileSearcher(object):
         return current_line
 
 
+postar_delimiter = ",,,,,"
+
+
 def binary_search_populate(file_path, storage_space, rna_info, debug=False):
+    # TODO: Fix a bug here that causes genes without any data to start collecting the whole genome!!
     RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord = rna_info
     query = Query((RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord))
     f = open(file_path)
@@ -81,13 +143,16 @@ def binary_search_populate(file_path, storage_space, rna_info, debug=False):
                 storage_space[rbp] = BindingSites(overlap_mode=True)
 
             # TODO: Consider reformatting the annotation for visual appeal
-            annotation = ", ".join([s[i] for i in [3, 4, 5, 7, 8, 9, 10]])
+            # annotation = ", ".join([s[i] for i in [3, 4, 5, 7, 8, 9, 10]])
+            # annotation = ", ".join([s[i] for i in [7, 8, 9, 10]])
+            annotation = postar_delimiter.join([s[i] for i in postar_columns_of_interest])
             storage_space[rbp].add((start, end, annotation))
 
         elif isFound:
             break
 
         s = f.readline().split()
+        # print(s)
 
 
 def generate_matrix_to_pwm_pickle(pickle_path):
@@ -150,17 +215,16 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
             # print(columns)
             assert (columns == ["Gene_name", "Gene_id", "Mutated", "Organism", "Motif", "Len", "Experiment_description",
                                 "Database", "Pubmed", "Experiment_description", "Family", "Matrix_id", "Score"])
-            s = handle.readline().split('\t')
+            s = handle.readline().replace("\n", "").split('\t')
             while s != ['']:
                 # Warning: Score ends with \n here, maybe remove using strip or indexing. For now, we don't care about
                 # score as it seems to be about literature
 
                 # We only care about human RBPs for now.
                 if s[3] != "Homo_sapiens":
-                    s = handle.readline().split('\t')
+                    s = handle.readline().replace("\n", "").split('\t')
                     continue
-                annotation = ", ".join([columns[i] + ": " + s[i] for i in [2, 6, 7, 8, 9, 10]]) + \
-                             ", Q-score: " + s[12][:-1]
+                annotation = postar_delimiter.join([s[i] for i in attract_columns_of_interest])
 
                 rbp = s[0]
                 # print("Getting data for", rbp)
@@ -173,7 +237,7 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
                 # print("done!")
 
                 if not sites:
-                    s = handle.readline().split('\t')
+                    s = handle.readline().replace("\n", "").split('\t')
                     continue
 
                 if rbp not in storageSpace:
@@ -182,7 +246,7 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
                 for start, end in sites:
                     storageSpace[rbp].add((start, end, annotation))
 
-                s = handle.readline().split('\t')
+                s = handle.readline().replace("\n", "").split('\t')
                 # print("done!")
     elif data_load_source == 'postar':
         file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
@@ -204,12 +268,39 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
     # storageSpace.summary()
     # print("Now individually filtering...")
     allowed_coverage = experimental_binding_site_acceptable_coverage_ratio * max_coverage
+
+    def merger(list_of_strings):
+        assert (len(list_of_strings) > 1)
+        digits = [''.join(filter(str.isdigit, string)) for string in list_of_strings]
+        total_sources = sum([0 if d == '' else int(d) for d in digits])
+        return list_of_strings[0 if " other sources" not in list_of_strings[0] else 1] + \
+               " and " + str(total_sources) + " other sources"
+
     for binding_site in storageSpace.values():
         # print("filtering", binding_site)
-        binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, inPlace=True)
+        binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, inPlace=True,
+                                      annotation_merger=lambda t: annotation_row_delimiter.join(t))
 
 
+def postar_to_columns(annotation):
+    rows = annotation.split(annotation_row_delimiter)
+    array = [tuple(r.split(postar_delimiter)) for r in rows]
+    array = list(set(array))
+    len_row = len(array[0])
+    no_of_rows = len(array)
+    array_of_strings = ['______'.join([array[i][j] for i in range(no_of_rows)]) for j in range(len_row)]
+
+    return array_of_strings
+
+
+keys = ["rbpdb", "attract", "rbpmap", "postar", "custom"]
+data_source_annotation_to_columns = {k: postar_to_columns for k in keys}
+# data_source_annotation_to_columns = {'binding': postar_to_columns, 'per_binding': postar_to_columns,
+#                                      'ucsc': postar_to_columns, 'comp_coop': postar_to_columns}
 if __name__ == '__main__':
+    # Tests for postar_to_columns
+    postar_to_columns("abc,def,ghi,jkl,")
+
     print("everything commented out!")
     # file_path = "../Raw Data/POSTAR ClipDB/human_RBP_binding_sites_sorted.txt"
     # RNA = "PTEN"

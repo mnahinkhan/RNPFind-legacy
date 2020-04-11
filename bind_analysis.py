@@ -466,17 +466,17 @@ class Storage:
                 filtered_storage[rbp] = filtered_rbp
         return filtered_storage
 
-    def printBED(self, chrN=1, displacement=0, endInclusion=False,
-                 addAnnotation=False, includeScore=False, scoreMax=1000, scoreBase=1000,
-                 includeColor=False, conditionalColor_func=-1, includeHeader=False,
-                 isBar=False):
+    def printBED(self, chrN=1, displacement=0, endInclusion=False, addAnnotation=False, includeScore=False,
+                 scoreMax=1000, scoreBase=1000, includeColor=False, conditionalColor_func=-1, includeHeader=False,
+                 isBar=False, is_additional_columns=False, annotation_to_additional_columns=None):
         outputStr = ""
         for rbp, binding_sites in self._RBPs.items():
-            outputStr += binding_sites.printBED(name=rbp, chrN=chrN,
-                                                displacement=displacement, endInclusion=endInclusion,
-                                                addAnnotation=addAnnotation, includeScore=includeScore,
-                                                scoreMax=scoreMax, scoreBase=scoreBase, includeColor=includeColor,
-                                                conditionalColor_func=conditionalColor_func, isBar=isBar)
+            outputStr += binding_sites.printBED(name=rbp, chrN=chrN, displacement=displacement,
+                                                endInclusion=endInclusion, addAnnotation=addAnnotation,
+                                                includeScore=includeScore, scoreMax=scoreMax, scoreBase=scoreBase,
+                                                includeColor=includeColor, conditionalColor_func=conditionalColor_func,
+                                                isBar=isBar, is_additional_columns=is_additional_columns,
+                                                annotation_to_additional_columns=annotation_to_additional_columns)
 
         if includeHeader:
             header = ('track name="' + rbp + '" description="A list of binding sites of ' +
