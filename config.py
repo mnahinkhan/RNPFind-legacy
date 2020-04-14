@@ -52,7 +52,7 @@ topSitesFilterPercentage = 0.30
 # Genome version being used
 genome_version = 'hg38'
 
-ucsc_track_visibility = "pack"
+ucsc_track_visibility = "dense"
 
 # This should be False normally. Only set to True if you want to make a dedicated directory for your RNA of interest.
 # Note that this flag only affects UCSC browser visualization method.
