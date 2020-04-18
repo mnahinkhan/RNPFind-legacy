@@ -6,7 +6,7 @@ import os  # sometimes you gotta browse files
 from config import experimental_binding_site_acceptable_coverage_ratio
 from custom_binding_data import custom_data
 import bisect
-from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan
+from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan, pwm_scan2
 
 postar_column_types = ["string", "int", "int", "string", "int", "string", "string", "string", "string", "string",
                        "float"]
@@ -227,15 +227,11 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
                 annotation = postar_delimiter.join([s[i] for i in attract_columns_of_interest])
 
                 rbp = s[0]
-                # print("Getting data for", rbp)
-                matrix_id = s[11]
-                # print("Let's get the PWM")
-                pwm = matrix_to_pwm_dict[matrix_id]
-                # print("Done!")
-                # print("Let's get the sites now")
-                sites = pwm_scan(rna_seq, pwm)
-                # print("done!")
 
+                matrix_id = s[11]
+
+                pwm = matrix_to_pwm_dict[matrix_id]
+                sites = pwm_scan2(rna_seq, pwm)
                 if not sites:
                     s = handle.readline().replace("\n", "").split('\t')
                     continue

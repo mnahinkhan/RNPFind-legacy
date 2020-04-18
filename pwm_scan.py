@@ -3,6 +3,7 @@ import random
 
 from config import genome_version
 import itertools
+
 bases = ["A", "G", "C", "T"]
 
 
@@ -57,7 +58,8 @@ def findall(p, s):
     i = s.find(p)
     while i != -1:
         yield i
-        i = s.find(p, i+1)
+        i = s.find(p, i + 1)
+
 
 def pwm_scan2(gene, pwm):
     len_gene = len(gene)
@@ -69,17 +71,23 @@ def pwm_scan2(gene, pwm):
     cut_off_percentage = 0.80
 
     cut_off_threshold = cut_off_percentage * max_score
-    possible_seqs = []
-    for sub_seq in itertools.product(bases, repeat=len_pwm):
+    possible_seqs = [("", 1)]
 
-        if product([pwm[sub_seq[i]][i] for i in range(len_pwm)]) >= cut_off_threshold:
-            possible_seqs += ["".join(sub_seq)]
+    for i in range(len_pwm):
+        new_possible_seqs = []
+        max_base_score = max([pwm[b][i] for b in bases])
+        for seq, score in possible_seqs:
+            for b in bases:
+                if score * pwm[b][i] / max_base_score >= cut_off_percentage:
+                    new_possible_seqs += [(seq + b, score * pwm[b][i] / max_base_score)]
+        possible_seqs = new_possible_seqs
+
+    possible_seqs = [x for x, y in possible_seqs]
 
     binding_sites = []
     for substring in possible_seqs:
-        binding_sites += [(i, i+len_pwm) for i in findall(substring, gene)]
+        binding_sites += [(i, i + len_pwm) for i in findall(substring, gene)]
     return binding_sites
-
 
 
 def pwm_str_to_dict(raw_pwm_str):
@@ -148,7 +156,6 @@ if __name__ == '__main__':
         print("Position: ", s, "to", t - 1)
         print("Sequence: ", RNA_sequence[s:t])
     print("Number of sites:", len(sites))
-
 
     end = timer()
     print(end - start, "seconds elapsed")
