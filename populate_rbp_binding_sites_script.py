@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 from config import genome_version, dedicated_analysis
-from loadData import data_source_annotation_to_columns
+from loadData import data_source_annotation_to_columns, data_load_source_colors
 
 
 def get_overarching_path(RNA):
@@ -42,21 +42,23 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
         f.write("cooperative threshold used: " + str(cooperative_threshold_bp) + "\n")
         f.close()
 
-        def coloring_func(storage, t):
+        red = (255, 0, 0)
+        green = (0, 255, 0)
+        yellow = (255, 255, 0)
+        orange = (255, 165, 0)
+        default_color = data_load_source_colors[data_load_source]
+
+        def coloring_func(storage, t, default_color=orange, comp_color=red, coop_color=green):
             competitive = main_rbp in storage.bindsNear(t, bp_threshold=competitive_threshold_bp)
             cooperative = main_rbp in storage.bindsNear(t, bp_threshold=cooperative_threshold_bp)
 
-            red = (255, 0, 0);
-            green = (0, 255, 0);
-            yellow = (255, 255, 0);
-            orange = (255, 165, 0)
-
-            return red if competitive else green if cooperative else orange
+            return comp_color if competitive else coop_color if cooperative else default_color
 
         for rbp in storage:
             total_sites = storage[[rbp]].printBED(chrN=RNA_chr_no, displacement=displacement, endInclusion=True,
                                                   addAnnotation=True, includeColor=True, includeHeader=False,
-                                                  conditionalColor_func=(lambda t: coloring_func(storage, t)),
+                                                  conditionalColor_func=(
+                                                      lambda t: coloring_func(storage, t, default_color=default_color)),
                                                   is_additional_columns=True, annotation_to_additional_columns=
                                                   data_source_annotation_to_columns[data_load_source])
 
