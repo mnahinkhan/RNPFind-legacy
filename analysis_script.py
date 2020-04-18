@@ -76,8 +76,10 @@ firstItem = itemgetter(0)
 
 # big_storage['experimental']['HNRNPC']
 
+synonym_func = dealWithDictionaryBuilding()
+
+
 def analysis_script():
-    synonym_func = dealWithDictionaryBuilding()
 
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
 
