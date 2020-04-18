@@ -39,7 +39,12 @@ column_data = {"postar": {"names": postar_column_names, "default_label": postar_
                }
 annotation_row_delimiter = ";;;;;"
 
-
+red = (255, 0, 0)
+green = (0, 255, 0)
+yellow = (255, 255, 0)
+orange = (255, 165, 0)
+blue = (0, 0, 255)
+data_load_source_colors = {"postar": orange, "attract": blue, "rbpdb": green}
 # TODO: Reorganize into multiple files, one for each method, with standardized form
 
 
