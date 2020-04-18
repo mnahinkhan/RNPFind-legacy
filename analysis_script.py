@@ -53,6 +53,7 @@ from analysis_functions import analysis_method_functions
 # Get some item getters ready for the rest of the journey:
 firstItem = itemgetter(0)
 
+
 # Explanation of data structure used in this program:
 
 # Top level: big_storage (dict)
@@ -75,59 +76,63 @@ firstItem = itemgetter(0)
 
 # big_storage['experimental']['HNRNPC']
 
+def analysis_script():
+    synonym_func = dealWithDictionaryBuilding()
 
-synonym_func = dealWithDictionaryBuilding()
+    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
 
-[RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
+    RNAInfo = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]
 
-RNAInfo = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]
+    data_load_sources = user_data_source_preference()
+    print("Collecting data now...")
 
-data_load_sources = user_data_source_preference()
-print("Collecting data now...")
+    # Stores data on binding sites for each data source.
+    bigStorage = {}
 
-# Stores data on binding sites for each data source.
-bigStorage = {}
+    # Now we start down each hierarchy:
+    for data_load_source in data_load_sources:
+        # Affects bigStorage by side-effect
+        # Loads computational and experimental data for RBPs that bind the lncRNA of interest
+        load_data(data_load_source, synonym_func, bigStorage, RNAInfo)
 
-# Now we start down each hierarchy:
-for data_load_source in data_load_sources:
-    # Affects bigStorage by side-effect
-    # Loads computational and experimental data for RBPs that bind the lncRNA of interest
-    load_data(data_load_source, synonym_func, bigStorage, RNAInfo)
+    # LOADING DATA
 
-# LOADING DATA
+    print("complete!")
+
+    # Todo: Consider using BIOGRID data in a meaningful way
+
+    #################
+    # All the data has been added. So we just have to analyse the data now:
+
+    no_genes = 0
+    no_sites = 0
+    for no_gene, no_site in [bigStorage[k].summary(is_return=True) for k in bigStorage]:
+        no_genes += no_gene
+        no_sites += no_site
+
+    print("We have populated " + str(no_genes) + " different RBPs with " + str(no_sites)
+          + " different binding sites on the " + RNA + " RNA sequence across the "
+          + str(RNA_end_chr_coord - RNA_start_chr_coord) + " bases specified!")
+    print("We are ready now")
+
+    # TODO DEAL WITH DATA SOURCES
+
+    while True:
+        analysis_method = user_analysis_preference()
+        analysis_method_function = analysis_method_functions[analysis_method]
+        analysis_method_function(bigStorage, RNAInfo, data_load_sources)
+
+        print("")
+        print("Thanks!")
+        print("")
+        print("Would you like to try another analysis method?")
+        print(">")
+        yn = input()
+        if "n" in yn:
+            break
+
+    analysis_script()
 
 
-print("complete!")
-
-# Todo: Consider using BIOGRID data in a meaningful way
-
-
-#################
-# All the data has been added. So we just have to analyse the data now:
-
-no_genes = 0
-no_sites = 0
-for no_gene, no_site in [bigStorage[k].summary(is_return=True) for k in bigStorage]:
-    no_genes += no_gene
-    no_sites += no_site
-
-print("We have populated " + str(no_genes) + " different RBPs with " + str(no_sites)
-      + " different binding sites on the " + RNA + " RNA sequence across the "
-      + str(RNA_end_chr_coord - RNA_start_chr_coord) + " bases specified!")
-print("We are ready now")
-
-# TODO DEAL WITH DATA SOURCES
-
-while True:
-    analysis_method = user_analysis_preference()
-    analysis_method_function = analysis_method_functions[analysis_method]
-    analysis_method_function(bigStorage, RNAInfo, data_load_sources)
-
-    print("")
-    print("Thanks!")
-    print("")
-    print("Would you like to try another analysis method?")
-    print(">")
-    yn = input()
-    if "n" in yn:
-        break
+if __name__ == '__main__':
+    analysis_script()
