@@ -6,7 +6,7 @@ import os  # sometimes you gotta browse files
 from config import experimental_binding_site_acceptable_coverage_ratio
 from custom_binding_data import custom_data
 import bisect
-from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan, pwm_scan2
+from pwm_scan import pwm_str_to_dict, get_human_seq, pwm_scan
 
 postar_column_types = ["string", "int", "int", "string", "int", "string", "string", "string", "string", "string",
                        "float"]
@@ -157,7 +157,6 @@ def binary_search_populate(file_path, storage_space, rna_info, debug=False):
             break
 
         s = f.readline().split()
-        # print(s)
 
 
 def generate_matrix_to_pwm_pickle(pickle_path):
@@ -236,7 +235,7 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
                 matrix_id = s[11]
 
                 pwm = matrix_to_pwm_dict[matrix_id]
-                sites = pwm_scan2(rna_seq, pwm)
+                sites = pwm_scan(rna_seq, pwm)
                 if not sites:
                     s = handle.readline().replace("\n", "").split('\t')
                     continue
@@ -279,7 +278,7 @@ def load_data(data_load_source, synonym_func, big_storage, rna_info):
 
     for binding_site in storageSpace.values():
         # print("filtering", binding_site)
-        binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, inPlace=True,
+        binding_site.overlap_collapse("baseCoverNumber", allowed_coverage, in_place=True,
                                       annotation_merger=lambda t: annotation_row_delimiter.join(t))
 
 
@@ -313,12 +312,12 @@ if __name__ == '__main__':
     # storage_space2 = {}
     # binary_search_populate(file_path, storage_space1, rna_info, debug=True)
     # print(len(storage_space1))
-    from synonym_dict_build import dealWithDictionaryBuilding
+    from synonym_dict_build import deal_with_dictionary_building
     from timeit import default_timer as timer
     from userInput import user_input
 
     test_my_own_rna = True
-    synonym_func = dealWithDictionaryBuilding()
+    synonym_func = deal_with_dictionary_building()
     big_storage = {}
 
     if test_my_own_rna:

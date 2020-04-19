@@ -1,7 +1,3 @@
-from operator import itemgetter
-from selector import select
-import os
-
 
 def generate_csv(symmetric_corr_table, rna_info, data_load_sources, stringency):
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info

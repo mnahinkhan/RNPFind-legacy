@@ -55,6 +55,6 @@ def ucsc_visualize(big_storage, rna_info, data_load_sources):
 
     ucsc_url = "http://genome.ucsc.edu/cgi-bin/hgTracks?db=" + genome_version + "&hubUrl=" + \
                hub_url + "&position=chr" + str(RNA_chr_no) + ":" + str(RNA_start_chr_coord) + "-" + str(
-        RNA_end_chr_coord)
+                RNA_end_chr_coord)
 
     print(ucsc_url)

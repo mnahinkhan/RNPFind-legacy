@@ -1,8 +1,4 @@
-# Test file to try scanning sequences with position weight matrices
-import random
-
 from config import genome_version
-import itertools
 
 bases = ["A", "G", "C", "T"]
 
@@ -26,51 +22,20 @@ def product(list_of_numbers):
     return answer
 
 
-def pwm_scan(gene, pwm):
-    len_gene = len(gene)
-    len_pwm = len(pwm["A"])
-    highest_scores = [max([pwm[b][i] for b in bases]) for i in range(len_pwm)]
-    max_score = product(highest_scores)
-    # print(len_gene)
-    # print(len_pwm)
-    cut_off_percentage = 0.80
-
-    cut_off_threshold = cut_off_percentage * max_score
-
-    binding_sites = []
-    for i in range(len_gene - len_pwm + 1):
-        score = 1
-        for j in range(len_pwm):
-            score *= pwm[gene[i + j]][j]
-            if score < cut_off_threshold:
-                break
-
-        if score >= cut_off_threshold:
-            binding_sites += [(i, i + len_pwm)]
-
-    return binding_sites
-
-
-def findall(p, s):
+def findall(needle, haystack):
     # https://stackoverflow.com/a/34445090/8551394
-    '''Yields all the positions of
-    the pattern p in the string s.'''
-    i = s.find(p)
+    """Yields all the positions of
+    the pattern p in the string s."""
+    i = haystack.find(needle)
     while i != -1:
         yield i
-        i = s.find(p, i + 1)
+        i = needle.find(haystack, i + 1)
 
 
-def pwm_scan2(gene, pwm):
-    len_gene = len(gene)
+def pwm_scan(gene, pwm):
     len_pwm = len(pwm["A"])
-    highest_scores = [max([pwm[b][i] for b in bases]) for i in range(len_pwm)]
-    max_score = product(highest_scores)
-    # print(len_gene)
-    # print(len_pwm)
     cut_off_percentage = 0.80
 
-    cut_off_threshold = cut_off_percentage * max_score
     possible_seqs = [("", 1)]
 
     for i in range(len_pwm):
@@ -116,31 +81,6 @@ if __name__ == '__main__':
     RNA_sequence = get_human_seq(RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord)
 
     example_motif = '''0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
-    0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538'''
-
-    pwm = pwm_str_to_dict(example_motif)
-
-    sites = pwm_scan(RNA_sequence, pwm)
-    for s, t in sites:
-        print("binding site found!")
-        print("Position: ", s, "to", t - 1)
-        print("Sequence: ", RNA_sequence[s:t])
-    print("Number of sites:", len(sites))
-
-    end = timer()
-    print(end - start, "seconds elapsed")
-
-    start = timer()
-    rna_info = RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
-
-    RNA_sequence = get_human_seq(RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord)
-
-    example_motif = '''0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
         0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
         0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
         0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
@@ -148,9 +88,9 @@ if __name__ == '__main__':
         0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538
         0.971153846154	0.00961538461538	0.00961538461538	0.00961538461538'''
 
-    pwm = pwm_str_to_dict(example_motif)
+    test_pwm = pwm_str_to_dict(example_motif)
 
-    sites = pwm_scan2(RNA_sequence, pwm)
+    sites = pwm_scan(RNA_sequence, test_pwm)
     for s, t in sites:
         print("binding site found!")
         print("Position: ", s, "to", t - 1)

@@ -49,8 +49,8 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
         default_color = data_load_source_colors[data_load_source]
 
         def coloring_func(storage, t, default_color=orange, comp_color=red, coop_color=green):
-            competitive = main_rbp in storage.bindsNear(t, bp_threshold=competitive_threshold_bp)
-            cooperative = main_rbp in storage.bindsNear(t, bp_threshold=cooperative_threshold_bp)
+            competitive = main_rbp in storage.binds_near(t, bp_threshold=competitive_threshold_bp)
+            cooperative = main_rbp in storage.binds_near(t, bp_threshold=cooperative_threshold_bp)
 
             return comp_color if competitive else coop_color if cooperative else default_color
 

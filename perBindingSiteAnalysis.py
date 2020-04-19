@@ -1,7 +1,6 @@
 from bind_analysis import BindingSites
 from operator import itemgetter
 from merge_annotation_funcs import generate_merge_func
-from selector import select
 import statistics  # Standard deviation mostly
 import operator
 
@@ -24,7 +23,9 @@ def perBindingSiteAnalysis(bigStorage, RNAInfo, data_load_sources):
 
     binding_info = {}
 
-    storageSpace = select(bigStorage,analysis_sources)
+    # CHECK IF THIS SELECTION IS IMPORTANT OR NOT
+    # Is this selection important??
+    # storageSpace = select(bigStorage,analysis_sources)
 
     # For each lncRNA, we want to analyze the AUF1 binding sites
     lncRNA = RNA
@@ -37,8 +38,8 @@ def perBindingSiteAnalysis(bigStorage, RNAInfo, data_load_sources):
     print("*****************")
 
     # Get the RBPs that bind close to sites on AUF1
-    filtered_storage_dict = lncRNA_storage.sitesAnalysis("AUF1",
-                                                         bp_threshold=analysis_per_binding_site_window)
+    filtered_storage_dict = lncRNA_storage.sites_analysis("AUF1",
+                                                          bp_threshold=analysis_per_binding_site_window)
 
     # Sort AUF1 sites by readCount
     auf1_sites = sorted(filtered_storage_dict.keys(),

@@ -1,5 +1,4 @@
 from sortedcontainers import SortedSet  # Allow sorted brackets of binding sites
-# import difflib
 from operator import itemgetter
 
 firstItem = itemgetter(0)
@@ -13,7 +12,7 @@ overlap_conflict = 'union'
 # Todo: implement a feature that allows belonging relationship to mean overlap over the structure...
 # Todo: implement a map function
 # Todo: Go through the class functions and change replace "-1" default arguments with "None" instead
-class BindingSites():
+class BindingSites:
     # Note that, in order to store binding sites in an ordered and non-redundant fashion from
     # multiple sources, a BindingSites class was implemented here.
     # The underlying implementation uses an ordered set to keep track of the ranges,
@@ -39,40 +38,42 @@ class BindingSites():
     # for collapsing the overlapping region based on a criteria (e.g. only those with support depth 5
     # or above, etc.)
     #
-    # Therefore, as of now, there are two main supported ways of using BindningSites:
-    #	1. You add intervals and let BindingSites dynamically take care of overlapping intervals for
-    #		you. Note that as of now, this is a default behaviour that always occurs.
-    #	2. You initialize BindingSites with a overlap_mode = True.
-    #		You then add intervals that are highly overlapping and, once complete, call the overlap_collapse()
-    #		function to collpase all the intervals as per your specifications. This sets the overlap_mode
-    #		to off. Following this, the representation of the BindingSites to the client magically
-    #		changes to the non-overlapping counterparts and enables the functions previously disabled
-    #		as overlap_mode was switched on.
+    # Therefore, as of now, there are two main supported ways of using BindingSites:
+    # 1. You add intervals and let BindingSites dynamically take care of overlapping intervals for
+    # you. Note that as of now, this is a default behaviour that always occurs.
+    # 2. You initialize BindingSites with a overlap_mode = True.
+    # You then add intervals that are highly overlapping and, once complete, call the overlap_collapse()
+    # function to collapse all the intervals as per your specifications. This sets the overlap_mode
+    # to off. Following this, the representation of the BindingSites to the client magically
+    # changes to the non-overlapping counterparts and enables the functions previously disabled
+    # as overlap_mode was switched on.
 
     # If overlap_collapse() is called too soon, everything has to be loaded again fresh.
 
-    def __init__(self, l=[], overlap_mode=False):
+    def __init__(self, list_of_sites=None, overlap_mode=False):
+        if list_of_sites is None:
+            list_of_sites = []
         self.overlap_mode = overlap_mode
         # Just a sorted set underneath
         self.sorted_sites = SortedSet()
-        for site in l:
+        for site in list_of_sites:
             self.add(site)
 
-    def __repr__(self, dispMeta=False):
+    def __repr__(self, display_meta=False):
         """Representation of BindingSites objects.
 
         Show all three elements (start, end, metadata) optionally by setting dispMeta = True
         or alternatively just show the first two tuple elements for succinctness
         """
         overlapAdd = "OverlapOn" if self.overlap_mode else ""
-        if dispMeta:
+        if display_meta:
             return self.sorted_sites.__repr__().replace("SortedSet", "BindingSites" + overlapAdd)
         else:
             return SortedSet(map(firstTwoItems, self.sorted_sites)
                              ).__repr__().replace("SortedSet", "BindingSites" + overlapAdd)
 
     def __str__(self):
-        return self.__repr__(dispMeta=True)
+        return self.__repr__(display_meta=True)
 
     def __len__(self):
         return self.sorted_sites.__len__()
@@ -86,14 +87,14 @@ class BindingSites():
             return BindingSites(self.sorted_sites[item])
         return self.sorted_sites[item]
 
-    def isOverlapRanges(p, q):
+    def is_overlap_ranges(p, q):
         """True iff the ranges (intervals) p and q overlap"""
 
         s1, e1, *m1 = p
         s2, e2, *m2 = q
         return s1 <= e2 and s2 <= e1
 
-    def _merge_meta(l, f=-1):
+    def _merge_meta(l, f=None):
         # assert(not self.overlap_mode)
         # TODO: fix the poor style of this function
         """Internal function for merging the annotations of multiple
@@ -118,7 +119,7 @@ class BindingSites():
 
         # Use user-defined function to merge the list of
         # annotations
-        if f != -1:
+        if f is not None:
             return f(new_l)
 
         # Otherwise, make a tuple of it, unless its just one element
@@ -131,7 +132,7 @@ class BindingSites():
         else:
             return new_l_set.pop()
 
-    def _collapse(l, f=-1):
+    def _collapse(l, f=None):
         """Takes a list of overlapping ranges and collapses them into one"""
 
         # assert(not self.overlap_mode)
@@ -147,7 +148,7 @@ class BindingSites():
                          BindingSites._merge_meta(list(map(thirdItem, l)), f))
         return to_return
 
-    def add(self, new_site, f=-1):
+    def add(self, new_site, f=None):
         """Dynamic addition of a range to a sorted set of non-overlapping ranges
         while maintaining the sorted property and merging any produced overlaps.
 
@@ -190,7 +191,7 @@ class BindingSites():
         # This part could be O(n) theoretically but experimentally, (higher-lower)
         # is always strictly less than 5 for this data
         for site in self.sorted_sites[lower:higher]:
-            if BindingSites.isOverlapRanges(site, new_site):
+            if BindingSites.is_overlap_ranges(site, new_site):
                 self.sorted_sites.remove(site)
                 to_merge.append(site)
 
@@ -237,13 +238,12 @@ class BindingSites():
 
             return cum / len(p)
 
-
         else:
             print("p is of type", type(p))
-            raise ValueError("Unsupoprted type for p, should be a tuple" +
+            raise ValueError("Unsupported type for p, should be a tuple" +
                              " or BindingSites")
 
-    def isOverlap(self, q):
+    def is_overlap(self, q):
         """This checks if an input tuple range overlaps one of those present in
         the set of binding sites stored in self"""
 
@@ -261,11 +261,11 @@ class BindingSites():
         higher = min(end_pos + 1, len(self.sorted_sites))
 
         for site in self.sorted_sites[lower:higher]:
-            if BindingSites.isOverlapRanges(site, q):
+            if BindingSites.is_overlap_ranges(site, q):
                 return True
         return False
 
-    def nearestSite(self, q):
+    def nearest_site(self, q):
         """This returns the closest range to the input tuple range
         present in the set of binding sites stored in self"""
 
@@ -292,7 +292,7 @@ class BindingSites():
                 return self.sorted_sites[pos - 1], max(0, dist_start)
 
     def distance(p, q):
-        if BindingSites.isOverlapRanges(p, q): return 0
+        if BindingSites.is_overlap_ranges(p, q): return 0
         s1, e1, *m = p
         s2, e2, *m = q
         return min(abs(s1 - e2), abs(s2 - e1))
@@ -303,7 +303,7 @@ class BindingSites():
     def len(self):
         return len(self)
 
-    def filterOverlap(self, q, bp_threshold=0):
+    def filter_overlap(self, q, bp_threshold=0):
         if self.overlap_mode:
             raise ValueError("filterOverlap() is not supported for BindingSites with overlap_mode set to True")
 
@@ -321,12 +321,12 @@ class BindingSites():
 
         outputBindingSites = BindingSites()
         for site in self.sorted_sites[lower:higher]:
-            if BindingSites.isOverlapRanges(site, q):
+            if BindingSites.is_overlap_ranges(site, q):
                 outputBindingSites.add(site)
         return outputBindingSites
 
     def printBED(self, name="Generic Binding Site", chrN=1, displacement=0, endInclusion=False, addAnnotation=False,
-                 includeScore=False, scoreMax=1000, scoreBase=1000, includeColor=False, conditionalColor_func=-1,
+                 includeScore=False, scoreMax=1000, scoreBase=1000, includeColor=False, conditionalColor_func=None,
                  isBar=False, is_additional_columns=False, annotation_to_additional_columns=None):
         # TOdo: Possibly remove the functionality for isBar, it seems misplaced!
         outputStr = ""
@@ -340,14 +340,8 @@ class BindingSites():
             start, end = displacement + start, (displacement + end +
                                                 (1 if endInclusion else 0))
 
-            # namedisp = name + ((": " + str(m)[1:-1]) if addAnnotation else "")
-            # namedisp = namedisp.replace(" ", "_")
-            # import random
-            # namedisp = ", ".join(random.choices('abcdefghijklmnopqrstuuvwxyz',k=10))
-
-            # namedisp = m.replace(" ", "")
-            namedisp = name
-            toJoin = [chrN, start, end, namedisp]
+            name_display = name
+            toJoin = [chrN, start, end, name_display]
 
             if includeColor and not includeScore:
                 score = 1000
@@ -370,7 +364,7 @@ class BindingSites():
             if includeColor:
                 strand = "+"  # default
 
-                if conditionalColor_func == -1:
+                if conditionalColor_func is None:
                     color = "0,0,0"  # black
                 else:
                     r, g, b = conditionalColor_func(_tuple)
@@ -415,7 +409,7 @@ class BindingSites():
 
         return binding_depth
 
-    def overlap_collapse(self, mode, number, inPlace=False, annotation_merger=-1):
+    def overlap_collapse(self, mode, number, in_place=False, annotation_merger=None):
         """Collapses the overlapping ranges to non-overlapping ones, based on preset
         conditions.
 
@@ -472,7 +466,7 @@ class BindingSites():
 
             if depth_cutoff == -1:
                 # print("WARNING: your baseCoverNumber is impossible to achieve!")
-                None
+                pass
 
         elif mode == 'TopDepthRatio':
             if not (0 <= number <= 1):
@@ -495,7 +489,7 @@ class BindingSites():
 
         sites = self.sorted_sites
         depth_cutoff = max(0, depth_cutoff)
-        if inPlace:
+        if in_place:
             self.overlap_mode = False
             self.sorted_sites = SortedSet()
             binding_site_to_add_to = self
@@ -527,10 +521,10 @@ class BindingSites():
         for site in sites:
             start, end, annotation = site
             # print(start, end, annotation)
-            site, distance = binding_site_to_add_to.nearestSite(site)
+            site, distance = binding_site_to_add_to.nearest_site(site)
             if distance == 0:
                 binding_site_to_add_to.add((start, end, annotation), annotation_merger)
-        if not inPlace:
+        if not in_place:
             return binding_site_to_add_to
 
     def base_cover(self):

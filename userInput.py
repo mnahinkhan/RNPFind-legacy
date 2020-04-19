@@ -99,10 +99,3 @@ def user_analysis_preference():
         s = input()
     print("Thank you")
     return analysis_methods_supported_internal[int(s)]
-
-
-
-
-#MORE DATABASES
-#KEEP TRACK OF EACH
-#UCSC = ONE LINK MULTIPLE

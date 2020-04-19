@@ -1,7 +1,7 @@
 #   iY Lab
 #   Project: Developing a tool for exploring  RNA-Protein interactions
 #
-#	Name 	: Muhammad Nahin Khan
+# Name 	: Muhammad Nahin Khan
 #   AndrewID  : mnk1
 #   File Created: 01/26/2020
 #
@@ -26,33 +26,17 @@
 # Some of these analysis methods may require additional input from the user.
 
 # Importing a bunch of dependencies:
-import pandas as pd  # To deal with excel data and processing in general
-from pandas import ExcelWriter
-import pyperclip  # Useful for copying things onto the clipboard
-import operator  # allows for mapping internal commands
-import math  # we love math
-import urllib
-from bind_analysis import BindingSites, Storage
-from custom_binding_data import custom_data
+
 from operator import itemgetter
-from config import *
-from synonym_dict_build import dealWithDictionaryBuilding
-from getAUF1ParClip import getAUF1ParClip
-from getAUF1BioGrid import getAUF1BioGrid
+from synonym_dict_build import deal_with_dictionary_building
 from loadData import load_data
-from merge_annotation_funcs import generate_merge_func
-from overAllCorrAnalysis import overall_correlation_analysis
-from perBindingSiteAnalysis import perBindingSiteAnalysis
 from userInput import user_input
 from userInput import user_data_source_preference
 from userInput import user_analysis_preference
-from ucsc_visualize import ucsc_visualize
-from selector import select
 from analysis_functions import analysis_method_functions
 
 # Get some item getters ready for the rest of the journey:
 firstItem = itemgetter(0)
-
 
 # Explanation of data structure used in this program:
 
@@ -76,11 +60,10 @@ firstItem = itemgetter(0)
 
 # big_storage['experimental']['HNRNPC']
 
-synonym_func = dealWithDictionaryBuilding()
+synonym_func = deal_with_dictionary_building()
 
 
 def analysis_script():
-
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
 
     RNAInfo = [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord]

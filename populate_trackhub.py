@@ -3,6 +3,7 @@ import trackhub
 import glob
 from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form, ucsc_track_visibility
 from loadData import prepare_auto_sql, column_data
+from binding_analysis_binding_sites import overlap_conflict
 
 
 def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks):
@@ -12,8 +13,6 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
     _str = f.read()
     competitive_threshold_bp = _str.split("\n")[0].split()[-1]
     cooperative_threshold_bp = _str.split("\n")[1].split()[-1]
-
-    from bind_analysis import overlap_conflict
 
     print(overlap_conflict)
 

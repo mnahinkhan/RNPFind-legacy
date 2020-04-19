@@ -1,8 +1,8 @@
-from binding_analysis_binding_sites import BindingSites, overlap_conflict
+from binding_analysis_binding_sites import BindingSites
 import xlrd  # just cuz of populate function?
 import pandas as pd  # just for populate...?
 from operator import itemgetter
-import difflib  # Just to suggest keys when misspelt!
+import difflib  # Just to suggest keys when mis-spelt!
 
 firstItem = itemgetter(0)
 secondItem = itemgetter(1)
@@ -58,10 +58,10 @@ class Storage:
         else:
             self.synonym_func = synonym_func
 
-    def __repr__(self, dispMeta=False):
+    def __repr__(self, display_meta=False):
         s = []
         for k, v in self._RBPs.items():
-            siteStr = v.__repr__(dispMeta=dispMeta)
+            siteStr = v.__repr__(display_meta=display_meta)
             i = siteStr[50:].find("),")
             s += [k + ": " + siteStr[0:52 + i] + "..."]
 
@@ -71,7 +71,7 @@ class Storage:
                 "the following " + str(len(self)) + " RBPs: \n\n" + "\n".join(s))
 
     def __str__(self):
-        return self.__repr__(dispMeta=True)
+        return self.__repr__(display_meta=True)
 
     def __len__(self):
         return self._RBPs.__len__()
@@ -79,7 +79,7 @@ class Storage:
     def __iter__(self):
         return self._RBPs.__iter__()
 
-    def RBPs(self):
+    def get_rbps(self):
         return self._RBPs.keys()
 
     def items(self):
@@ -150,7 +150,7 @@ class Storage:
         This is helpful for checking if the misalignment parameter is correct
         or not for each of the files.
         ATTRACT file should be an excel sheet copied from the print results
-        screenon the website after scanning an RNA sequence for RBP protein
+        screen on the website after scanning an RNA sequence for RBP protein
         binding sites.
         RBPDB file should also be a similarly copied excel file.
         RBPMap file should be a txt file that is downloaded from the website
@@ -201,12 +201,12 @@ class Storage:
                 # Now collect all the data into "self._RBPs"
                 for row in my_data[["Gene Name", "Off Set", "Len", "Motif"]].itertuples():
                     # Motif was only included for experimentally finding the mis_alignment
-                    gene = row[1].upper();
-                    offsets = str(row[2]);
-                    length = row[3];
+                    gene = row[1].upper()
+                    offsets = str(row[2])
+                    length = row[3]
                     score = "-1"
                     gene = self.synonym_func(gene)
-                    # Semilcolon separated offsets:
+                    # Semicolon separated offsets:
                     for off in map(int, offsets.split(";")):
                         # The end needs to be set to offset+length-1, because of
                         # inclusive indexing
@@ -218,7 +218,6 @@ class Storage:
                             motif = row[4]
                             print("writing gene", gene, "to bind from", off + mis_align,
                                   "to", off + mis_align + length - 1, "with motif of", motif)
-
 
             elif data_source == "RBPDB":
                 # Read the appropriate file
@@ -232,9 +231,9 @@ class Storage:
                 for row in my_data[["RBP Name", "Start", "End", "Matching sequence", "Score"]].itertuples():
                     # Motif (matching sequence) is only included for experimentally
                     # finding the mis_alignment
-                    gene = row[1].upper();
-                    start = row[2];
-                    end = row[3];
+                    gene = row[1].upper()
+                    start = row[2]
+                    end = row[3]
                     score = row[5]
                     gene = self.synonym_func(gene)
 
@@ -245,7 +244,6 @@ class Storage:
                         motif = row[4]
                         print("writing gene", gene, "to bind from", start + mis_align,
                               "to", end + mis_align, "with motif of", motif)
-
 
             elif data_source == "RBPMAP":
                 try:
@@ -287,8 +285,6 @@ class Storage:
                                       "to", end + mis_align, "with motif of", motif)
 
                         s = h.readline()
-
-
 
             else:
                 print("scanning an", data_source, "file with a",
@@ -384,7 +380,7 @@ class Storage:
 
         return self.corr_table, self.corr_table_f_measure, self.corr_sorted, self.corr_bp_threshold
 
-    def lookup(self, x, y=-1, disp_threshold=-0.1, displayMode=True, bp_threshold=30):
+    def lookup(self, x, y=-1, display_threshold=-0.1, display_mode=True, bp_threshold=30):
         if self.corr_table == -1 or self.corr_bp_threshold != bp_threshold:
             self.self_analysis(bp_threshold=bp_threshold, display_threshold=1.1)
 
@@ -392,10 +388,10 @@ class Storage:
             to_return_list = []
             d = self.corr_table_f_measure.get(x, {})
             for key in sorted(d, key=d.get, reverse=True):
-                if float(d[key]) > disp_threshold:
+                if float(d[key]) > display_threshold:
                     to_return_list.append((key, d[key]))
 
-            if not displayMode:
+            if not display_mode:
                 return to_return_list
             else:
                 for k in to_return_list:
@@ -407,7 +403,7 @@ class Storage:
     def lookup_table(self):
         return self.corr_table_f_measure
 
-    def bindsNear(self, p, bp_threshold=30):
+    def binds_near(self, p, bp_threshold=30):
         """This function takes a tuple representing an interval that one wants to test
         on the lncRNA and returns a Storage of RBPs binding to on near that interval"""
         start, end, *m = p
@@ -416,7 +412,7 @@ class Storage:
         to_return = Storage()
 
         for k in self._RBPs:
-            if self._RBPs[k].isOverlap(q):
+            if self._RBPs[k].is_overlap(q):
                 to_return[k] = self._RBPs[k]
 
         return to_return
@@ -432,7 +428,7 @@ class Storage:
 
         return to_return
 
-    def sitesAnalysis(self, gene, bp_threshold=0):
+    def sites_analysis(self, gene, bp_threshold=0):
         """
 
         This function returns a dictionary mapping the binding sites of an input gene
@@ -448,7 +444,7 @@ class Storage:
         to_return_dict = {}  # rbp keys mapping to nearest site and distance
 
         for site in self[gene]:
-            to_return_dict[site] = self.allSitesIn(site, bp_threshold=bp_threshold)
+            to_return_dict[site] = self.all_sites_in(site, bp_threshold=bp_threshold)
 
         return to_return_dict
 
@@ -458,10 +454,10 @@ class Storage:
     def len(self):
         return len(self)
 
-    def allSitesIn(self, site, bp_threshold=0):
+    def all_sites_in(self, site, bp_threshold=0):
         filtered_storage = Storage()
         for rbp, binding_sites in self._RBPs.items():
-            filtered_rbp = binding_sites.filterOverlap(site, bp_threshold=bp_threshold)
+            filtered_rbp = binding_sites.filter_overlap(site, bp_threshold=bp_threshold)
             if len(filtered_rbp) > 0:
                 filtered_storage[rbp] = filtered_rbp
         return filtered_storage
