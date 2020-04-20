@@ -57,3 +57,9 @@ ucsc_track_visibility = "dense"
 # This should be False normally. Only set to True if you want to make a dedicated directory for your RNA of interest.
 # Note that this flag only affects UCSC browser visualization method.
 dedicated_analysis = False
+
+# Exactly how strong is a letter when written as a motif, compared with other letters? How many times more likely?
+rbpdb_motif_pwm_letter_strength = 4  # I believe any value from 2-10 makes no difference in practice
+rbpdb_motif_n_repeat_req = 6
+
+pwm_scan_cut_off_percentage = 0.80

@@ -99,6 +99,7 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
 
 
 def convert_bed_to_bb(overarching_path, data_load_sources):
+    debug = False
     if genome_version != "hg38":
         raise ValueError("Update this function for this genome version!")
 
@@ -110,7 +111,7 @@ def convert_bed_to_bb(overarching_path, data_load_sources):
         os.system(
             "for file in * .bed; do ../../../ucsc-tools/bedToBigBed -as=../../../autosql_files/" + as_file_name +
             " type=bed9+" + str(no_of_extra_fields) + ' "$file" ' +
-            '../../../ucsc-tools/hg38.chrom.sizes "$file.bb"; done >/dev/null 2>&1')
+            '../../../ucsc-tools/hg38.chrom.sizes "$file.bb"; done' + (' >/dev/null 2>&1' if not debug else ''))
         os.chdir(CUR)
     return
 
@@ -132,7 +133,8 @@ def density_plot(big_storage, rna_info, data_load_sources, overarching_path, ret
         print("Starting with", data_load_source, "data...")
 
         storage = big_storage[data_load_source]
-        wig_string = storage.print_wig(chr_no=RNA_chr_no, displacement=RNA_start_chr_coord, include_name=True,
+        # TODO: check if displacement needs to be shifted by one for all data sources or just RBPDB
+        wig_string = storage.print_wig(chr_no=RNA_chr_no, displacement=RNA_start_chr_coord - 1, include_name=True,
                                        include_description=True, name=RNA,
                                        description="Density plot of " + str(len(storage)) + " RBPs on " + RNA,
                                        include_header=True)

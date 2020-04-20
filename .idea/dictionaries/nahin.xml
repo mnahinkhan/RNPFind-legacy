@@ -5,16 +5,20 @@
       <w>chrom</w>
       <w>hnrnpc</w>
       <w>hnrnpd</w>
+      <w>homolog</w>
       <w>ihab</w>
       <w>nahin</w>
       <w>ncbi</w>
       <w>postar</w>
+      <w>pubmed</w>
       <w>rbpdb</w>
       <w>rbpmap</w>
       <w>rbps</w>
       <w>sapiens</w>
+      <w>selex</w>
       <w>ucsc</w>
       <w>uniprot</w>
+      <w>vivo</w>
     </words>
   </dictionary>
 </component>

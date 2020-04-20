@@ -17,7 +17,8 @@ def get_overarching_path(RNA):
 def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
 
-    displacement = RNA_start_chr_coord
+    # TODO: check if this -1 patch is necessary for all data sources or just RBPDB
+    displacement = RNA_start_chr_coord - 1
 
     overarching_path = get_overarching_path(RNA)
 

@@ -379,7 +379,7 @@ class BindingSites:
                 toJoin += [strand, name, number_of_bars, score]
 
             if is_additional_columns:
-                toJoin += [s.replace(" ", "_") for s in annotation_to_additional_columns(annotation)]
+                toJoin += [s.replace(" ", "_") if s else ".'" for s in annotation_to_additional_columns(annotation)]
             outputStr += "\t".join(map(str, toJoin)) + "\n"
 
         return outputStr
