@@ -248,7 +248,7 @@ class Storage:
             elif data_source == "RBPMAP":
                 try:
                     h = open(file)
-                except:
+                except FileNotFoundError:
                     print("reading", file)
                     raise ValueError("File for RBPMap should be valid text file")
 

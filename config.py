@@ -63,3 +63,8 @@ rbpdb_motif_pwm_letter_strength = 4  # I believe any value from 2-10 makes no di
 rbpdb_motif_n_repeat_req = 6
 
 pwm_scan_cut_off_percentage = 0.80
+
+# This is data loading specific. If you are implementing a data load function, make sure your data does not have
+# the following substrings in their annotations for binding sites. If they do, you should change the strings below!
+annotation_column_delimiter = ",,,,,"
+annotation_row_delimiter = ";;;;;"

@@ -28,7 +28,6 @@
 # Importing a bunch of dependencies:
 
 from operator import itemgetter
-from synonym_dict_build import deal_with_dictionary_building
 from loadData import load_data
 from userInput import user_input
 from userInput import user_data_source_preference
@@ -60,8 +59,6 @@ firstItem = itemgetter(0)
 
 # big_storage['experimental']['HNRNPC']
 
-synonym_func = deal_with_dictionary_building()
-
 
 def analysis_script():
     [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = user_input()
@@ -72,13 +69,8 @@ def analysis_script():
     print("Collecting data now...")
 
     # Stores data on binding sites for each data source.
-    bigStorage = {}
-
-    # Now we start down each hierarchy:
-    for data_load_source in data_load_sources:
-        # Affects bigStorage by side-effect
-        # Loads computational and experimental data for RBPs that bind the lncRNA of interest
-        load_data(data_load_source, synonym_func, bigStorage, RNAInfo)
+    # Loads computational and experimental data for RBPs that bind the lncRNA of interest
+    bigStorage = load_data(data_load_sources, RNAInfo)
 
     # LOADING DATA
 

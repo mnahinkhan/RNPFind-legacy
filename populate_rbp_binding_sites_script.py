@@ -1,7 +1,8 @@
 from datetime import datetime
 import os
 from config import genome_version, dedicated_analysis
-from loadData import data_source_annotation_to_columns, data_load_source_colors
+from loadData import data_source_annotation_to_columns
+from data_load_functions import data_load_source_colors
 
 
 def get_overarching_path(RNA):

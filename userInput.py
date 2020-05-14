@@ -1,5 +1,5 @@
 from config import data_load_sources_supported, data_load_sources_supported_short_form
-from analysis_functions import analysis_methods_supported, analysis_methods_supported_internal
+from analysis_functions import analysis_methods_supported_long, analysis_methods_supported_short
 from gene_coordinates import gene_to_coord
 
 
@@ -87,15 +87,15 @@ def user_analysis_preference():
     print("")
     print("Which method of analysis on the data would you like to employ today?")
     print("")
-    for i, source in enumerate(analysis_methods_supported):
+    for i, source in enumerate(analysis_methods_supported_long):
         print("[" + str(i) + "]: " + source)
     print("")
     print("Please pick just one analysis method and write the number associated with it (e.g. 3)")
     print(">")
     s = input()
-    while not (len(s) == 1 and s.isdigit() and int(s) < len(analysis_methods_supported_internal)):
+    while not (len(s) == 1 and s.isdigit() and int(s) < len(analysis_methods_supported_short)):
         print("Please pick just one analysis method and write the number associated with it (e.g. 3)")
         print(">")
         s = input()
     print("Thank you")
-    return analysis_methods_supported_internal[int(s)]
+    return analysis_methods_supported_short[int(s)]
