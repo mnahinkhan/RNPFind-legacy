@@ -4,7 +4,7 @@ from populate_trackhub import populate_local_track_hub, convert_bed_to_bb, uploa
 from config import genome_version
 
 
-def ucsc_visualize(big_storage, rna_info, data_load_sources):
+def ucsc_visualize(big_storage, rna_info):
     [_, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
 
     print("")
@@ -13,6 +13,7 @@ def ucsc_visualize(big_storage, rna_info, data_load_sources):
     print("Please type the name of one RBP you are interested in (if not, just press enter): ")
     main_rbp: str = input()
 
+    data_load_sources = big_storage.keys()
     print("Thank you!")
     print("Populating the local computer with bed files...")
     overarching_path = populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp)

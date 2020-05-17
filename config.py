@@ -1,7 +1,7 @@
 # Building dictionary takes time. Set to false to use an identity function instead.
 
 dictionaryBuild = True
-ncbi_gene_path = "../Raw Data/NCBI Gene Info/"
+ncbi_gene_dir = "../Raw Data/NCBI Gene Info/"
 ncbi_gene_files = ["Human Genes and Synonyms.xlsx",
                    "Saccharomyces_cerevisiae.xlsx",
                    "Drosophila_melanogaster.xlsx"]

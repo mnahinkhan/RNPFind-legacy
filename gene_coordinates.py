@@ -1,3 +1,6 @@
+# File dedicated to functions that help with converting a string representing a gene name to its coordinates on the
+# hg38 chromosome.
+
 import os
 import pickle
 from typing import Union, Dict
@@ -151,6 +154,7 @@ def remove_outliers(array):
     # return [x for i, x in enumerate(array) if s[i] < cutoff]
 
 
+# TODO: Consider the potential role of picklify in this file
 def gene_to_coord(gene):
     if os.path.isfile(path_to_pickle):
         with open(path_to_pickle, 'rb') as handle:
@@ -168,16 +172,17 @@ def gene_to_coord(gene):
 
 
 if __name__ == "__main__":
-    import itertools
-
-    with open(path_to_pickle, 'rb') as handle:
-        nameToOfficial, officialToCoord = pickle.load(handle)
-
-        length_wanted = 1000
-        for g in map(''.join, itertools.product('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', repeat=5)):
-            #print(g)
-            if g in nameToOfficial and nameToOfficial[g] in officialToCoord:
-                c,s,e = list(officialToCoord[nameToOfficial[g]])
-                if 4000 > e-s > 1000:
-                    print(e-s)
-                    print(g)
+    pass
+    # import itertools
+    #
+    # with open(path_to_pickle, 'rb') as handle:
+    #     nameToOfficial, officialToCoord = pickle.load(handle)
+    #
+    #     length_wanted = 1000
+    #     for g in map(''.join, itertools.product('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', repeat=5)):
+    #         #print(g)
+    #         if g in nameToOfficial and nameToOfficial[g] in officialToCoord:
+    #             c,s,e = list(officialToCoord[nameToOfficial[g]])
+    #             if 4000 > e-s > 1000:
+    #                 print(e-s)
+    #                 print(g)

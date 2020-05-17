@@ -52,7 +52,7 @@ def get_rna_coord(rna_gene_name):
     return RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord
 
 
-def user_input():
+def get_user_rna_preference():
     print("")
     print("")
     print("Welcome to RNPFind!")
@@ -65,7 +65,7 @@ def user_input():
     return RNA.upper(), RNA_chr_no, int(RNA_start_chr_coord), int(RNA_end_chr_coord)
 
 
-def user_data_source_preference():
+def get_user_data_source_preference():
     print("")
     print("")
     print("Which sources of data would you like to collect RBP binding data from today?")
@@ -82,7 +82,7 @@ def user_data_source_preference():
     return [data_load_sources_supported_short_form[int(i)] for i in s]
 
 
-def user_analysis_preference():
+def get_user_analysis_preference():
     print("")
     print("")
     print("Which method of analysis on the data would you like to employ today?")

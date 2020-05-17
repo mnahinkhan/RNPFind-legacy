@@ -433,7 +433,7 @@ class Storage:
 
         This function returns a dictionary mapping the binding sites of an input gene
         to a Storage variable that stores RBPs that bind within a threshold range of the
-        site. The Storage variable only contains bidning site informations for the sites
+        site. The Storage variable only contains binding site information for the sites
         that are nearby to the key site and excludes data about other binding sites."""
         # sanity check
         if gene not in self._RBPs:

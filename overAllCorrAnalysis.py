@@ -1,6 +1,8 @@
+# File dedicated to the correlation matrix generation analysis function
+
 
 def generate_csv(symmetric_corr_table, rna_info, data_load_sources, stringency):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
+    [RNA, _, _, _] = rna_info
 
     path_to_save = "../csv_files/" + RNA + "_" + "_".join(data_load_sources) + "_" + str(stringency) + ".csv"
     with open(path_to_save, 'w+') as csv_file:
@@ -17,15 +19,14 @@ def generate_csv(symmetric_corr_table, rna_info, data_load_sources, stringency):
     return path_to_save
 
 
-def generate_heat_map(symmetric_corr_table, rna_info, data_load_sources, threshold):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
+def generate_heat_map(_, rna_info, __, ___):
+    [_, _, _, _] = rna_info
     print("HEAT MAP GENERATED")
     return
 
 
 # As of now, takes two rna arguments only.
-def overall_correlation_analysis(big_storage, rna_info, data_load_sources):
-
+def overall_correlation_analysis(big_storage, rna_info):
     print("For this analysis method, we need the nucleotide base distance stringency threshold number.")
     print('''This number indicates the number of bases away that two binding sites can be before they are ''' +
           '''considered "too far"''')
@@ -38,6 +39,7 @@ def overall_correlation_analysis(big_storage, rna_info, data_load_sources):
     threshold = int(threshold)
     print("Thanks, this could take some time...")
     symmetric_corr_tables = {}
+    data_load_sources = big_storage.keys()
     for data_load_source in data_load_sources:
         print("")
         print("Working on ", data_load_source, "data...")

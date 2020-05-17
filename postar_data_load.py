@@ -5,17 +5,18 @@ import bisect
 
 from config import annotation_column_delimiter
 
-postar_column_types = ["string", "int", "int", "string", "int", "string", "string", "string", "string", "string",
-                       "float"]
-postar_column_names = ["chrom", "chromStart", "chromEnd", "postarID", "nil", "strand", "rbpName", "dataSource",
-                       "cellType", "expSource", "postarScore"]
-postar_column_descriptions = ["chromosome number", "start coordinate", "end coordinate", "POSTAR database ID",
-                              "not sure", "strand", "RBP Name", "Data Source", "Cell type", "experimental source",
-                              "score"]
+postar_all_column_names = ["chrom", "chromStart", "chromEnd", "postarID", "nil", "strand", "rbpName", "dataSource",
+                           "cellType", "expSource", "postarScore"]
+postar_all_column_descriptions = ["chromosome number", "start coordinate", "end coordinate", "POSTAR database ID",
+                                  "not sure", "strand", "RBP Name", "Data Source", "Cell type", "experimental source",
+                                  "score"]
 
 postar_columns_of_interest = [3, 7, 8, 9, 10]
 postar_default_label_index = [8]
 postar_default_mouse_over_index = 9
+
+postar_column_names = [postar_all_column_names[i] for i in postar_columns_of_interest]
+postar_column_descriptions = [postar_all_column_descriptions[i] for i in postar_columns_of_interest]
 
 
 class Query(object):

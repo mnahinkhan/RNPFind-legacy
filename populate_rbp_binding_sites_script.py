@@ -1,22 +1,24 @@
 from datetime import datetime
 import os
+
+from colors import red, green
 from config import genome_version, dedicated_analysis
-from loadData import data_source_annotation_to_columns
+from load_data import data_source_annotation_to_columns
 from data_load_functions import data_load_source_colors
 
 
-def get_overarching_path(RNA):
+def get_overarching_path(rna):
     if not dedicated_analysis:
-        year, month, day, hour, min, sec, x, y, z = datetime.now().timetuple()
-        year, month, day, hour, min, sec = [str(x) for x in [year, month, day, hour, min, sec]]
-        time_date = "_".join([year, month, day, hour, min, sec])
+        year, month, day, hour, minute, sec, x, y, z = datetime.now().timetuple()
+        year, month, day, hour, minute, sec = [str(x) for x in [year, month, day, hour, minute, sec]]
+        time_date = "_".join([year, month, day, hour, minute, sec])
     else:
-        time_date = RNA
+        time_date = rna
     return "../rbp_binding_sites_bed_files/" + time_date + "/"
 
 
 def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
+    [RNA, RNA_chr_no, RNA_start_chr_coord, _] = rna_info
 
     # TODO: check if this -1 patch is necessary for all data sources or just RBPDB
     displacement = RNA_start_chr_coord - 1
@@ -44,25 +46,21 @@ def populate_binding_sites(big_storage, rna_info, data_load_sources, main_rbp):
         f.write("cooperative threshold used: " + str(cooperative_threshold_bp) + "\n")
         f.close()
 
-        red = (255, 0, 0)
-        green = (0, 255, 0)
-        yellow = (255, 255, 0)
-        orange = (255, 165, 0)
         default_color = data_load_source_colors[data_load_source]
+        comp_color = red
+        coop_color = green
 
-        def coloring_func(storage, t, default_color=orange, comp_color=red, coop_color=green):
-            competitive = main_rbp in storage.binds_near(t, bp_threshold=competitive_threshold_bp)
-            cooperative = main_rbp in storage.binds_near(t, bp_threshold=cooperative_threshold_bp)
-
+        def coloring_func(binding_site):
+            competitive = main_rbp in storage.binds_near(binding_site, bp_threshold=competitive_threshold_bp)
+            cooperative = main_rbp in storage.binds_near(binding_site, bp_threshold=cooperative_threshold_bp)
             return comp_color if competitive else coop_color if cooperative else default_color
 
         for rbp in storage:
             total_sites = storage[[rbp]].printBED(chrN=RNA_chr_no, displacement=displacement, endInclusion=True,
                                                   addAnnotation=True, includeColor=True, includeHeader=False,
-                                                  conditionalColor_func=(
-                                                      lambda t: coloring_func(storage, t, default_color=default_color)),
-                                                  is_additional_columns=True, annotation_to_additional_columns=
-                                                  data_source_annotation_to_columns[data_load_source])
+                                                  conditionalColor_func=coloring_func, is_additional_columns=True,
+                                                  annotation_to_additional_columns=data_source_annotation_to_columns[
+                                                      data_load_source])
 
             filepath = rbp + "_" + data_load_source + "_" + genome_version + "_sites.bed"
 

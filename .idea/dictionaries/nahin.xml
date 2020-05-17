@@ -1,14 +1,18 @@
 <component name="ProjectDictionaryState">
   <dictionary name="nahin">
     <words>
+      <w>agcnnnyws</w>
       <w>biogrid</w>
       <w>chrom</w>
+      <w>equiprobable</w>
       <w>hnrnpc</w>
       <w>hnrnpd</w>
+      <w>hnrnpk</w>
       <w>homolog</w>
       <w>ihab</w>
       <w>nahin</w>
       <w>ncbi</w>
+      <w>picklify</w>
       <w>postar</w>
       <w>pubmed</w>
       <w>pwms</w>
@@ -20,6 +24,7 @@
       <w>ucsc</w>
       <w>uniprot</w>
       <w>vivo</w>
+      <w>wikipedia</w>
     </words>
   </dictionary>
 </component>

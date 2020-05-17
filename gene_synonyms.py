@@ -1,3 +1,6 @@
+# This file deals with making dictionaries that map gene names to a "default" gene name among its group of synonyms.
+# I do not know if this file is serving a purpose in the project anymore or not.
+
 import pandas as pd
 
 

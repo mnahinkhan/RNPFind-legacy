@@ -1,21 +1,26 @@
+# This file contains functions for loading data from the rbpdb database.
+
 import math
-import pickle
-
 from config import rbpdb_motif_pwm_letter_strength, rbpdb_motif_n_repeat_req, annotation_column_delimiter
-from pwm_scan import get_human_seq, pwm_motif_to_dict, pwm_str_to_dict, pwm_degree_of_freedom, pwm_scan, pwm_scan2
+from picklify import picklify
+from pwm_scan import get_human_seq, motif_to_pwm, str_to_pwm, pwm_degree_of_freedom, pwm_scan, \
+    pwm_scan_naive_brute_force
 
-rbpdb_column_names = ["protein_id", "annotation_id", "creation_date", "update_date", "gene_name", "gene_description",
-                      "species", "taxID", "domains", "aliases", "flag_protein", "flag_notes", "some_other_id",
-                      "experimental_id", "PUBMED_ID", "exp_type", "notes", "seq_motif", "selex_file",
-                      "aligned_selex_file", "aligned_motif_file", "PWM_file", "PFM_file", "logo_file",
-                      "secondary_structure", "in_vivo_notes", "in_vivo_file", "flag_experimental"]
-rbpdb_column_descriptions = rbpdb_column_names
+rbpdb_all_column_names = ["protein_id", "annotation_id", "creation_date", "update_date", "gene_name",
+                          "gene_description", "species", "taxID", "domains", "aliases", "flag_protein", "flag_notes",
+                          "some_other_id", "experimental_id", "PUBMED_ID", "exp_type", "notes", "seq_motif",
+                          "selex_file", "aligned_selex_file", "aligned_motif_file", "PWM_file", "PFM_file", "logo_file",
+                          "secondary_structure", "in_vivo_notes", "in_vivo_file", "flag_experimental"]
+rbpdb_all_column_descriptions = rbpdb_all_column_names
 rbpdb_columns_of_interest = [0, 1, 3, 4, 5, 8, 9, 13, 14, 15, 16, 17, 22, 24, 25]
 rbpdb_default_label_index = [8]
 rbpdb_default_mouse_over_index = 9
 
+rbpdb_column_names = [rbpdb_all_column_names[i] for i in rbpdb_columns_of_interest]
+rbpdb_column_descriptions = [rbpdb_all_column_descriptions[i] for i in rbpdb_columns_of_interest]
 
-def generate_rbpdb_experiment_to_columns_pickle(pickle_path):
+
+def generate_rbpdb_experiment_to_columns():
     rbpdb_experiment_file_path = "../Raw Data/RBPDB PWMs/RBPDB_v1-5/RBPDB_v1.3.1_experiments_human_2012-11-21.tdt"
     experiment_id_to_columns_dict = {}
     with open(rbpdb_experiment_file_path) as handle:
@@ -32,25 +37,10 @@ def generate_rbpdb_experiment_to_columns_pickle(pickle_path):
             experimental_id = columns[0]
             experiment_id_to_columns_dict[experimental_id] = columns
             s = handle.readline()
-    with open(pickle_path, 'wb') as handle:
-        pickle.dump(experiment_id_to_columns_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def get_rbpdb_experiment_to_columns_dict():
-    pickle_path = "../Raw Data/RBPDB PWMs/RBPDB_v1-5/experiment_id_to_columns.pickle"
-
-    try:
-        with open(pickle_path, 'rb') as handle:
-            experiment_id_to_columns_dict = pickle.load(handle)
-    except FileNotFoundError:
-        generate_rbpdb_experiment_to_columns_pickle(pickle_path)
-        with open(pickle_path, 'rb') as handle:
-            experiment_id_to_columns_dict = pickle.load(handle)
-
     return experiment_id_to_columns_dict
 
 
-def generate_rbpdb_protein_to_experiment_id_pickle(pickle_path):
+def generate_rbpdb_protein_to_experiment_id():
     rbpdb_protein_experiment_file_path = \
         "../Raw Data/RBPDB PWMs/RBPDB_v1-5/RBPDB_v1.3.1_protExp_human_2012-11-21.tdt"
     protein_id_to_experimental_ids_dict = {}
@@ -65,25 +55,10 @@ def generate_rbpdb_protein_to_experiment_id_pickle(pickle_path):
             protein_id_to_experimental_ids_dict[protein_id] = protein_id_to_experimental_ids_dict.get(protein_id, []) \
                 + [experimental_id]
             s = handle.readline()
-    with open(pickle_path, 'wb') as handle:
-        pickle.dump(protein_id_to_experimental_ids_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def get_rbpdb_protein_to_experiment_id_dict():
-    pickle_path = "../Raw Data/RBPDB PWMs/RBPDB_v1-5/protein_id_to_experimental_id.pickle"
-
-    try:
-        with open(pickle_path, 'rb') as handle:
-            protein_id_to_experimental_ids_dict = pickle.load(handle)
-    except FileNotFoundError:
-        generate_rbpdb_protein_to_experiment_id_pickle(pickle_path)
-        with open(pickle_path, 'rb') as handle:
-            protein_id_to_experimental_ids_dict = pickle.load(handle)
-
     return protein_id_to_experimental_ids_dict
 
 
-def generate_rbpdb_experimental_to_pwm_pickle(pickle_path, letter_strength, n_repeat_req):
+def generate_rbpdb_experimental_to_pwm(letter_strength, n_repeat_req):
     rbpdb_experiment_file_path = "../Raw Data/RBPDB PWMs/RBPDB_v1-5/RBPDB_v1.3.1_experiments_human_2012-11-21.tdt"
     rbpdb_pfm_file_directory = "../Raw Data/RBPDB PWMs/matrices_human/PFMDir/"
     experimental_to_pwm_dict = {}
@@ -109,7 +84,7 @@ def generate_rbpdb_experimental_to_pwm_pickle(pickle_path, letter_strength, n_re
                 pfm_file_path = rbpdb_pfm_file_directory + pfm_file
                 with open(pfm_file_path) as pfm_file_handle:
                     raw_pwm_str = pfm_file_handle.read()
-                pwm = pwm_str_to_dict(raw_pwm_str, is_transpose=True)
+                pwm = str_to_pwm(raw_pwm_str, is_transpose=True)
                 pwms += [pwm]
             elif seq_motifs != "\\N" and seq_motifs != "":
                 # This experiment still generated some useful data
@@ -154,29 +129,13 @@ def generate_rbpdb_experimental_to_pwm_pickle(pickle_path, letter_strength, n_re
                                                         seq_motif[middle + 1: bracket_end])
                         seq_motifs += [seq_motif_1, seq_motif_2]
                     else:
-                        pwm = pwm_motif_to_dict(seq_motif, letter_strength=letter_strength)
+                        pwm = motif_to_pwm(seq_motif, letter_strength=letter_strength)
                         pwms += [pwm]
                     i += 1
 
             # Now we have the raw text, we convert it to pwm and add to dictionary
             experimental_to_pwm_dict[experimental_id] = pwms
             s = handle.readline()
-
-    with open(pickle_path, 'wb') as handle:
-        pickle.dump(experimental_to_pwm_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def get_rbpdb_experimental_to_pwm_dict(letter_strength, n_repeat_req):
-    pickle_path = "../Raw Data/RBPDB PWMs/RBPDB_v1-5/experimental_id_to_pwm_" \
-                  + str(letter_strength) + "_" + str(n_repeat_req) + ".pickle"
-
-    try:
-        with open(pickle_path, 'rb') as handle:
-            experimental_to_pwm_dict = pickle.load(handle)
-    except FileNotFoundError:
-        generate_rbpdb_experimental_to_pwm_pickle(pickle_path, letter_strength, n_repeat_req)
-        with open(pickle_path, 'rb') as handle:
-            experimental_to_pwm_dict = pickle.load(handle)
 
     return experimental_to_pwm_dict
 
@@ -188,11 +147,11 @@ def rbpdb_data_load(rna_info):
     RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord = rna_info
     rna_seq = get_human_seq(RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord)
 
-    experiment_id_to_pwm_dict = get_rbpdb_experimental_to_pwm_dict(letter_strength, n_repeat_req)
-    protein_id_to_experimental_ids_dict = get_rbpdb_protein_to_experiment_id_dict()
-    experiment_id_to_columns_dict = get_rbpdb_experiment_to_columns_dict()
+    experiment_id_to_pwm_dict = picklify(generate_rbpdb_experimental_to_pwm, letter_strength, n_repeat_req)
+    protein_id_to_experimental_ids_dict = picklify(generate_rbpdb_protein_to_experiment_id)
+    experiment_id_to_columns_dict = picklify(generate_rbpdb_experiment_to_columns)
     with open(rbpdb_protein_file_path) as handle:
-        columns = handle.readline().strip().split('\t')
+        _ = handle.readline().strip().split('\t')
         # columns here is expected to have the following information in the following order:
         # protein_id, annotation_id, creation_date, update_date, gene_name, gene_description, species, taxID,
         # domains, aliases, flag, flag_notes, some_other_id
@@ -226,7 +185,7 @@ def rbpdb_data_load(rna_info):
                     if pwm_degree_of_freedom(pwm) >= 2048:
                         # experimentally shown that by this point naive brute force is faster. Bound could be
                         # reduced.
-                        sites = pwm_scan2(rna_seq, pwm)
+                        sites = pwm_scan_naive_brute_force(rna_seq, pwm)
                     else:
                         sites = pwm_scan(rna_seq, pwm)
 

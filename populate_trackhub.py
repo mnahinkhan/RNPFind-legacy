@@ -1,9 +1,10 @@
 import os
 import trackhub
 import glob
-from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form, ucsc_track_visibility
-from loadData import prepare_auto_sql, column_data
+from config import genome_version, data_load_sources_supported, data_load_sources_supported_short_form, \
+    ucsc_track_visibility
 from binding_analysis_binding_sites import overlap_conflict
+from data_load_functions import column_data
 
 
 def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_no_dict, rbp_peaks):
@@ -98,6 +99,32 @@ def populate_local_track_hub(overarching_path, rbp, rna_info, local_stage, rbp_n
     return hub_name
 
 
+def prepare_auto_sql(data_load_source):
+    source_columns_of_interest = range(len(column_data[data_load_source]["names"]))
+    no_of_extra_fields = len(source_columns_of_interest)
+    name_of_file = data_load_source + "".join([str(c) for c in source_columns_of_interest]) + ".as"
+    file_path = "../autosql_files/" + name_of_file
+    template_file_path = "../autosql_files/general_template.as"
+    try:
+        open(file_path, 'r').close()
+    except FileNotFoundError:
+        with open(file_path, 'w') as handle:
+            # TODO: make an auto generator of auto_sql template files here
+            with open(template_file_path, "r") as template_handle:
+                template_string = template_handle.read()
+                template_string = template_string.replace("insert_source_name_here", data_load_source)
+
+            handle.write(template_string)
+            column_names = [column_data[data_load_source]["names"][i] for i in source_columns_of_interest]
+            descriptions = [column_data[data_load_source]["descriptions"][i] for i in source_columns_of_interest]
+            additional_str = ""
+            for column, description in zip(column_names, descriptions):
+                additional_str += "\t".join(["lstring", column + ";", '"' + description + '"']) + "\n"
+            additional_str += ")"
+            handle.write(additional_str)
+    return no_of_extra_fields, name_of_file
+
+
 def convert_bed_to_bb(overarching_path, data_load_sources):
     debug = False
     if genome_version != "hg38":
@@ -124,9 +151,7 @@ def upload_online(local_dir, github_dir):
 
 
 def density_plot(big_storage, rna_info, data_load_sources, overarching_path, return_rbp_no=False):
-    [RNA, RNA_chr_no, RNA_start_chr_coord, RNA_end_chr_coord] = rna_info
-
-    length = RNA_end_chr_coord - RNA_start_chr_coord
+    [RNA, RNA_chr_no, RNA_start_chr_coord, _] = rna_info
     rbp_no_dict = {}
     for data_load_source in data_load_sources:
         print("")

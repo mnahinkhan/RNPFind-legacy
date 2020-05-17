@@ -29,3 +29,5 @@ For data analysis, we plan on adding multiple forms of analysis, including:
  
  
  Note that the repository hosts only the script files and misses key data files necessary for the tool's function. These files will be added later once the tool is ready for deployment.
+ 
+ For further information on how the scripts work together, read "main.py" and work your way from there!
